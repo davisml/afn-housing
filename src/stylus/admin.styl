@@ -1,0 +1,105 @@
+@import 'nib'
+
+afnRed = rgb(193, 23, 4)
+navigationHeight = 50px
+sidebarWidth = 70px
+
+body
+	font-family Helvetica Neue
+	padding 0px
+	margin 0px
+	width 100%
+	height 100%
+	overflow hidden
+
+#sidebar
+	absolute top left bottom
+	width sidebarWidth
+	display flex
+	flex-direction column
+	background rgb(46,46,46)
+	align-items center
+	
+	img
+		width 48px
+		height 48px
+		display inline-block
+		margin-top 10px
+		user-select none
+		vertical-align middle
+
+.sidebar-item
+	background linear-gradient(top, rgb(5,5,5), rgb(25,25,25))
+	width sidebarWidth
+	margin-top 10px
+	text-align center
+	padding 15px 0px
+	padding-top 5px
+	box-shadow 0px 1px 0px rgba(255,255,255,0.02), inset 0px 1px 1px rgba(0,0,0,0.5)
+	
+	img
+		width 36px !important
+		height 36px !important
+
+.forms-table
+	width 100%
+	text-align left
+	border none
+	border-bottom 1px solid rgb(245,245,245)
+	border-collapse collapse
+	
+	tr
+		td
+			padding 15px 20px
+			border-right 1px solid rgb(245,245,245)
+			border-bottom 1px solid rgb(245,245,245)
+		
+		th
+			padding 10px 20px
+			background rgb(253,253,253)
+			border-right 1px solid rgb(245,245,245)
+			border-bottom 1px solid rgb(245,245,245)
+		
+		&:active
+			background rgb(253,253,253)
+
+#app-content
+	absolute top left sidebarWidth right bottom
+	box-shadow -1px 0px 3px rgba(0,0,0,0.5)
+	background white
+
+#navigation
+	absolute top left right
+	height navigationHeight
+	background linear-gradient(top, afnRed, darken(afnRed, 5%))
+	padding 11px 10px
+	box-sizing border-box
+	display flex
+	flex-direction row
+	align-items center
+	padding 0px 10px
+	
+	.nav-item
+		color white
+		vertical-align middle
+		display inline-block
+		margin-right 5px
+		font-size 17px
+		flex 0 1 1
+		padding 5px 15px
+		border-radius 16px
+		user-select none
+		cursor pointer
+		
+		&:hover
+			background darken(afnRed, 10%)
+		
+		&.active
+			background darken(afnRed, 40%)
+			cursor default
+
+#admin-content
+	background white
+	absolute top navigationHeight left bottom right
+	overflow-y auto
+	overflow-x hidden
