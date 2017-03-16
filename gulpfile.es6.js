@@ -103,18 +103,18 @@ const getBundler = (scriptName, args) => {
 gulp.task('watchify', function () {
     var args = merge(watchify.args, { debug: true })
     var appBundler = getBundler('App.js', args)
-    var adminBundler = getBundler('Admin.js', args)
+    // var adminBundler = getBundler('Admin.js', args)
 
     bundle_js(appBundler, 'app')
-    bundle_js(adminBundler, 'admin')
+    // bundle_js(adminBundler, 'admin')
 
     appBundler.on('update', function () {
         bundle_js(appBundler, 'app')
     })
 
-    adminBundler.on('update', function () {
-        bundle_js(adminBundler, 'admin')
-    })
+    // adminBundler.on('update', function () {
+        // bundle_js(adminBundler, 'admin')
+    // })
 })
 
 // Without watchify
@@ -180,7 +180,6 @@ gulp.task('serve', function () {
     var express = require('express')
     var app = express()
     app.use(server)
-    app.use(express.static(path.resolve(__dirname, './dist/')))
     app.use(require('connect-livereload')())
     app.listen(port)
     console.log('Listening on port ' + port)

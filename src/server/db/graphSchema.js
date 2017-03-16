@@ -152,6 +152,16 @@ graphFields.housingForms = {
     resolve: () => HousingForm.findAll()
 }
 
+graphFields.housingForm = {
+    type: HousingFormType,
+    args: {
+        id: {
+            type: GraphQLInt
+        }
+    },
+    resolve: (parent, { id }) => HousingForm.findById(id)
+}
+
 graphFields.locations = {
 	type: new GraphQLList(LocationType),
 	resolve: () => Location.findAll()

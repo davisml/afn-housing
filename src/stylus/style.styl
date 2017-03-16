@@ -11,69 +11,81 @@ body
   margin 0px
   padding 0px
 
-.sidebar
+headerHeight = 90px
+
+#toolbar
   position absolute
   top 0px
   left 0px
   right 0px
-  height 120px
+  height headerHeight
   text-align center
   display flex
   background rgb(193, 23, 4)
   color white
+  
+  img
+    width 48px
+    height @width
 
-.sidebar-wrapper
-  width 100%
-  margin-left auto
-  margin-right auto
-  max-width 960px
-  display flex
-  flex-direction row
-  align-items center
-  padding-left 20px
-  padding-right 20px
+  h3
+    display none
+    padding 0px
+    margin-bottom 0px
+
+  h4
+    margin 0px
+    padding 0px
+    margin-top 5px
+    font-weight 500
+    color rgba(255,255,255,0.8)
+    font-size 18px
+  
+  .steps
+    display flex
+    // flex 1
+    flex-direction row
+    align-items center
+    color rgb(255, 246, 204)
+    font-size 22px
+    
+    .step
+      margin-left 20px
+      line-height 1
+
+      &.active
+        color rgb(253, 206, 8)
+  
+  .toolbar-wrapper
+    width 100%
+    margin-left auto
+    margin-right auto
+    max-width 960px
+    display flex
+    flex-direction row
+    align-items center
+    padding-left 20px
+    padding-right 20px
+  
+  @media(max-width: 570px)
+    .toolbar-wrapper
+      align-items center
+      justify-content center
+
+    .step
+      display none
+      
+      &.active
+        display block
 
 .content
   position absolute
-  top 120px
+  top headerHeight
   left 0px
   bottom 0px
   right 0px
   padding-top 15px
   overflow scroll
-
-.sidebar img
-  width 80px
-  height @width
-
-.sidebar h3
-  display none
-  padding 0px
-  margin-bottom 0px
-
-.sidebar h4 {
-  margin: 0px;
-  padding: 0px;
-  margin-top: 5px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.8);
-  font-size: 18px;
-}
-
-.steps
-  display flex
-  flex 1
-  flex-direction row
-  align-items center
-  color rgb(255, 246, 204)
-  font-size 22px
-
-.step
-  margin-left 20px
-  line-height 1
-
-  &.active
-    color rgb(253, 206, 8)
 
 h1
   margin-top 0px
@@ -85,26 +97,64 @@ h1
 .btn
   display inline-block
   text-align center
-  background linear-gradient(top, rgb(110, 110, 110), darken(rgb(110, 110, 110), 10%))
-  border none
-  text-shadow 0px 1px 0px rgba(0,0,0,0.1)
-  color white
+  background linear-gradient(top, lighten(rgb(255, 246, 203), 50%), darken(rgb(255, 246, 203), 0%))
+  border 1px solid rgba(170, 88, 37, 0.2)
+  text-shadow 0px 1px 0px rgba(255,255,255,0.25)
+  color lighten(rgb(142, 74, 31), 10%)
   font-smoothing antialiased
   border-radius 4px
   padding 8px 16px
   padding-top 10px
-  font-size 22px
-  font-weight 500
+  font-size 20px
+  font-weight 600
   margin-right 10px
   cursor pointer
-
-.btn-default
-  background linear-gradient(top, rgb(253, 155, 8), darken(rgb(253, 155, 8), 10%))
-  color white
-  border none
-  text-shadow 0px 1px 0px rgba(0,0,0,0.1)
+  box-shadow inset 0px 1px 0px rgba(255,255,255,0.25)
   
   &:hover:active
-    background darken(rgb(253, 155, 8), 15%)
+    background darken(rgb(255, 246, 203), 10%)
+    box-shadow inset 0px 1px 3px rgba(170, 88, 37, 0.25)
+  
+  &:focus
+    border-color rgb(253, 155, 8)
+    outline none
+    box-shadow 0px 0px 3px rgb(253, 155, 8)
+
+.btn-default
+  background linear-gradient(top, lighten(rgb(254, 206, 4), 55%), lighten(rgb(254, 206, 4), 15%))
+  color lighten(rgb(142, 74, 31), 10%)
+  border-color rgba(142, 74, 31, 0.2)
+  box-shadow inset 0px 1px 0px rgba(255,255,255,0.25)
+  
+  &:hover:active
+    background lighten(rgb(254, 206, 4), 5%)
+    box-shadow inset 0px 1px 3px rgba(142, 74, 31, 0.25)
+
+.form-group
+  display flex
+  flex-direction row
+  padding 0px 10px
+  width 100%
+  flex-wrap wrap
+  
+  .form-item
+    width 25%
+    padding 20px 10px
+    box-sizing border-box
+    text-align left
+    
+    @media(max-width: 950px)
+      width 33%
+    
+    @media(max-width: 700px)
+      width 50%
+    
+    .form-label
+      margin-bottom 5px
+      color rgb(120, 120, 120)
+
+    .form-value
+      font-weight 500
 
 @import './form.styl'
+@import './admin.styl'

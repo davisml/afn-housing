@@ -23,13 +23,16 @@
   margin-right: auto;
 }
 
-.form-alt {
-  padding-top: 10px;
-  background: rgb(248,248,248);
-  border-top: 1px solid rgb(240,240,240);
-  border-bottom: 1px solid rgb(240,240,240);
-  margin: 10px 0px;
-}
+desaturationAmount = 90%
+altBackground = desaturate(rgb(255, 254, 250), desaturationAmount)
+altBorder = desaturate(rgb(245, 240, 223), desaturationAmount)
+
+.form-alt
+  padding-top 10px
+  background altBackground
+  border-top 1px solid altBorder
+  border-bottom 1px solid altBorder
+  margin 10px 0px
 
 .form-cell {
   flex: 1;
@@ -138,7 +141,7 @@ h1
 
 .switch
   border-color rgb(190, 190, 190)
-  background rgb(240,240,240)
+  background desaturate(rgb(238, 219, 191), 50%)
   box-shadow inset 0px 1px 3px rgba(0,0,0,0.1)
   width 50px
   height 26px
@@ -149,10 +152,25 @@ h1
   float right
   
   &.on
-    background rgb(253, 155, 8)
+    background rgb(254, 206, 4)
 
     .switch-toggle
         left 24px
+
+.birthdate
+  display flex
+  flex-direction row
+  
+  .year-cell
+    flex 1
+  
+  .day-cell
+    flex 1
+    margin-right 20px
+  
+  .month-cell
+    flex 1
+    margin-right 20px
 
 .form-control
   &.invalid
@@ -160,12 +178,14 @@ h1
     box-shadow 0px 0px 3px rgb(193, 22, 5)
 
 select
-  padding 10px
+  padding 0px 10px
+  padding-top 1px
+  // padding-bottom 0px
   font-size 18px
   height 39px
   width 100%
   background white url('/img/down-arrow.png') no-repeat
-  background-position top 12px right 10px
+  background-position top 13px right 10px
   background-size 12px 12px
   border-color rgb(190, 190, 190)
   -webkit-appearance none
