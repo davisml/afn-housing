@@ -5,11 +5,16 @@ const Query = function(query, variables) {
 		Request.post(`/graphql`).set('Content-Type', 'application/json').send({query, variables}).end((error, response) => {
 			if (error) {
 				if (response.body.errors) {
-					reject(response.body.errors[0])
-					return
-				}
+					const [error] = response.body.errors
 
-				reject(error)
+					if (error.message) {
+						reject(error.message)
+					} else {
+						reject(error)
+					}
+				} else {
+					reject(error)
+				}
 			} else {
 				resolve(response.body.data)
 			}

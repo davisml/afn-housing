@@ -1,6 +1,7 @@
 import React from 'react'
 import Switch from 'react-toggle-switch'
 import TextField from '../components/TextField'
+import validateField from './validateField'
 import {fromJS} from 'immutable'
 
 const relationshipOptions = fromJS([
@@ -15,6 +16,10 @@ const relationshipOptions = fromJS([
 	{
 		value: 'parent',
 		label: 'Grandparent'
+	},
+	{
+		value: 'partner',
+		label: 'Significant Other'
 	}
 ])
 
@@ -63,29 +68,22 @@ const AdditionalInfo = ({ data, handleChange, onChange, toggleSwitch }) => {
 	
 	const handlePersonChange = (index) => {
 		return (individual) => {
+			console.log(`update in ${ index }`)
+			console.log(individual)
+			
 			onChange(data.updateIn(['individuals', index], () => {
 				return individual
 			}))
 		}
 	}
 
-	const invalid = data.get('invalid')
+	const invalid = data.get('invalid') || false
 
 	const renderPersonRow = (person, index) => {
 		const key = `person-${ index }`
 		const rowProps = { invalid, key, index, data: person, onChange: handlePersonChange(index) }
-		
-		console.log(`render person row: ${ invalid }`)
 
 		return <PersonRow { ...rowProps } />
-	}
-
-	const handleDisabledPersonChange = (index) => {
-		return (individual) => {
-			onChange(data.updateIn(['disabledIndividuals', index], () => {
-				return individual
-			}))
-		}
 	}
 	
 	let disabledIndividuals = []

@@ -1,36 +1,25 @@
 import React from 'react'
 import FormComponent from './FormComponent'
-import {Map, List} from 'immutable'
+import {Map, List, fromJS} from 'immutable'
 import ClassNames from 'classnames'
 import Request from 'superagent'
 import {getURLParams} from './helpers'
-
-const Query = function(query, variables) {
-	return new Promise((resolve, reject) => {
-		Request.post(`/graphql`).set('Content-Type', 'application/json').send({query, variables}).end((error, response) => {
-			if (error) {
-				if (response.body.errors) {
-					reject(response.body.errors[0])
-					return
-				}
-
-				reject(error)
-			} else {
-				resolve(response.body.data)
-			}
-		})
-	})
-}
+import Query from './Query'
 
 class AppComponent extends React.Component {
 	constructor(props) {
 		super(props)
 
 		const numberOfIndividuals = 2
-		const numberOfDisabledIndividuals = 1
 
-		this.state = {
-			data: new Map({
+		let data = null
+
+		const savedDataString = localStorage.getItem('formData')
+
+		if (savedDataString) {
+			data = fromJS(JSON.parse(savedDataString))
+		} else {
+			data = new Map({
 				isMember: false,
 				firstName: '',
 				lastName: '',
@@ -45,13 +34,14 @@ class AppComponent extends React.Component {
 				isConsideredElder: false,
 				residesWithDisabled: false,
 				requiresSupport: false,
-				numberOfDisabledIndividuals,
 				additionalInformation: '',
 				numberOfIndividuals,
-				individuals: this.initList(new List(), numberOfIndividuals),
-				disabledIndividuals: this.initDisabledList(new List(), numberOfDisabledIndividuals),
-				// currentStep: 0
+				individuals: this.initList(new List(), numberOfIndividuals)
 			})
+		}
+
+		this.state = {
+			data
 		}
 	}
 
@@ -75,21 +65,6 @@ class AppComponent extends React.Component {
 		})
 	}
 
-	initDisabledList(individuals, size) {
-		return individuals.setSize(size).map((individual) => {
-			if (!individual) {
-				return new Map({
-					name: '',
-					age: '',
-					relationship: 'child',
-					disability: 0
-				})
-			}
-
-			return individual
-		})
-	}
-
 	initList(individuals, size) {
 		return individuals.setSize(size).map((individual) => {
 			if (!individual) {
@@ -107,7 +82,7 @@ class AppComponent extends React.Component {
 	render() {
 		const handleSubmit = (input) => {
 			console.log(`handle submit`)
-			
+
 			Query(`
 				mutation SubmitForm($input: HousingFormInput) {
 					submitForm(input: $input) {
@@ -128,19 +103,13 @@ class AppComponent extends React.Component {
 			let newData = data
 
 			const numberOfIndividuals = data.get('numberOfIndividuals')
-			const numberOfDisabledIndividuals = data.get('numberOfDisabledIndividuals')
-
 			if (numberOfIndividuals != this.state.data.get('numberOfIndividuals')) {
 				newData = newData.update('individuals', (individuals) => {
 					return this.initList(individuals, numberOfIndividuals)
 				})
 			}
 
-			if (numberOfDisabledIndividuals != this.state.data.get('numberOfDisabledIndividuals')) {
-				newData = newData.update('disabledIndividuals', (individuals) => {
-					return this.initDisabledList(individuals, numberOfIndividuals)
-				})
-			}
+			localStorage.setItem('formData', JSON.stringify(newData.toJS()))
 
 			this.setState({ data: newData })
 		}

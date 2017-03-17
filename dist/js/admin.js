@@ -26721,13 +26721,11 @@ var AdditionalInfo = function AdditionalInfo(_ref5) {
 		};
 	};
 
-	var invalid = data.get('invalid');
+	var invalid = data.get('invalid') || false;
 
 	var renderPersonRow = function renderPersonRow(person, index) {
 		var key = 'person-' + index;
 		var rowProps = { invalid: invalid, key: key, index: index, data: person, onChange: handlePersonChange(index) };
-
-		console.log('render person row: ' + invalid);
 
 		return _react2.default.createElement(PersonRow, rowProps);
 	};

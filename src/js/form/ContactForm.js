@@ -50,12 +50,12 @@ const ContactForm = ({data, handleChange}) => {
 							<select value={ data.get('birthMonth') } onChange={ handleChange('birthMonth') }>
 								{
 									months.map((option, index) => {
-										let value = index + 1
-
+										let value = index
+										
 										if (index === 0) {
 											value = -1
 										}
-
+										
 										return <option key={`month-${ index }`} value={ value }>{ option }</option>
 									})
 								}

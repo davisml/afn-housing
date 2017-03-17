@@ -50,7 +50,8 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		delete formData.lastName
 		delete formData.email
 		delete formData.telephone
-
+		delete formData.invalid
+		
 		delete formData.locations
 		delete formData.numberOfIndividuals
 		delete formData.numberOfDisabledIndividuals
@@ -58,6 +59,25 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 
 		formData.member.phone = formData.member.telephone
 		delete formData.member.telephone
+
+		// formData.birthDate = Moment()
+		console.log(`month: ${ formData.birthMonth }`)
+
+		const year = Number(formData.birthYear)
+		const month = Number(formData.birthMonth) - 1
+		const day = Number(formData.birthDayOfMonth)
+
+		console.log(`${ day }/${ month }/${ year }`)
+
+		const date = new Date(year, month, day)
+
+		console.log(`birth date`)
+		console.log(date)
+
+		formData.birthDate = date
+		delete formData.birthYear
+		delete formData.birthMonth
+		delete formData.birthDayOfMonth
 
 		onSubmit(formData)
 	}
@@ -76,16 +96,16 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 				}
 			})
 		} else if (currentStep == 2) {
-			data.get('individuals').forEach((individual) => {
-				['name', 'age'].forEach((key) => {
-					const value = data.get(key)
+			const individuals = data.get('individuals').toJS().slice()
+			console.log(individuals)
 
-					if (!validateField(key, value)) {
-						console.log(`${ key } is invalid`)
-						valid = false
-					}
-				})
-			})
+			for (let i = 0; i < individuals.length; i++) {
+				const person = individuals[i]
+
+				if (!person.name.length || Number(person.age) <= 0 || Number(person.age) >= 130) {
+					valid = false
+				}
+			}
 		}
 
 		console.log(`validate: ${ valid }`)

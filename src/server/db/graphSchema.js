@@ -261,6 +261,10 @@ const HousingFormInputType = new GraphQLInputObjectType({
         	type: GraphQLString,
         	default: null
         },
+        birthDate: {
+            type: GraphQLString,
+            default: null
+        },
         individuals: {
         	type: new GraphQLList(IndividualInputType)
         }
