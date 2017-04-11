@@ -6,15 +6,19 @@ import {fromJS} from 'immutable'
 
 const relationshipOptions = fromJS([
 	{
-		value: 'child',
-		label: 'Child'
+		value: 'son',
+		label: 'Son'
+	},
+	{
+		value: 'daughter',
+		label: 'Daughter'
 	},
 	{
 		value: 'parent',
 		label: 'Parent'
 	},
 	{
-		value: 'parent',
+		value: 'grandParent',
 		label: 'Grandparent'
 	},
 	{
@@ -70,7 +74,7 @@ const AdditionalInfo = ({ data, handleChange, onChange, toggleSwitch }) => {
 		return (individual) => {
 			console.log(`update in ${ index }`)
 			console.log(individual)
-			
+
 			onChange(data.updateIn(['individuals', index], () => {
 				return individual
 			}))

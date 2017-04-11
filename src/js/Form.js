@@ -5,6 +5,7 @@ import ClassNames from 'classnames'
 import Request from 'superagent'
 import {getURLParams} from './helpers'
 import Query from './Query'
+import CompleteView from './CompleteView'
 
 class AppComponent extends React.Component {
 	constructor(props) {
@@ -71,7 +72,7 @@ class AppComponent extends React.Component {
 				return new Map({
 					name: '',
 					age: '',
-					relationship: 'child'
+					relationship: 'boy'
 				})
 			}
 
@@ -90,7 +91,11 @@ class AppComponent extends React.Component {
 					}
 				}
 			`, { input }).then((response) => {
-				console.log(response)
+				if (response.submitForm && response.submitForm.id) {
+					localStorage.removeItem('formData')
+					
+					this.setState({ complete: true })
+				}
 			}).catch((error) => {
 				console.log("Error")
 				console.error(error)
@@ -150,6 +155,14 @@ class AppComponent extends React.Component {
 			}
 		}
 
+		let content = <FormComponent { ...componentProps } />
+
+		if (this.state.complete) {
+			const fullName = data.get('firstName') + ' ' + data.get('lastName')
+
+			content = <CompleteView name={ fullName }/>
+		}
+
 		return <div id="form">
 			<div id="toolbar">
 				<div className="toolbar-wrapper">
@@ -159,9 +172,7 @@ class AppComponent extends React.Component {
 					</div>
 				</div>
 			</div>
-			<div className="content">
-				<FormComponent { ...componentProps } />
-			</div>
+			<div className="content">{ content }</div>
 		</div>
 	}
 }

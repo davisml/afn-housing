@@ -6,11 +6,11 @@ export default ({ onSelect }) => (
 		<img src="/img/sanddollar.svg" draggable={ false } />
 
 		<div className="sidebar-item active" onClick={ onSelect }>
-			<Icon name="house" />
-		</div>
-		
-		<div className="sidebar-item">
 			<Icon name="request" />
 		</div>
+
+		{/*<div className="sidebar-item">
+			<Icon name="request" />
+		</div>*/}
 	</div>
 )

@@ -11,6 +11,7 @@ import ContactForm from './form/ContactForm'
 import MemberInfo from './form/MemberInfo'
 import AdditionalInfo from './form/AdditionalInfo'
 import LocationInfo from './form/LocationInfo'
+import calculateAge from './calculateAge'
 
 let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, currentStep}) => {
 	const handleChange = (key) => {
@@ -95,6 +96,24 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 					valid = false
 				}
 			})
+
+			// console.log('validate birthday')
+			
+			const {birthYear, birthMonth, birthDayOfMonth} = data.toJS()
+
+			const year = Number(birthYear)
+			const month = Number(birthMonth) - 1
+			const day = Number(birthDayOfMonth)
+			const date = new Date(year, month, day)
+
+			const age = calculateAge(date)
+
+			if (age < 18) {
+				// console.log(`age is invalid ${ age }`)
+				valid = false
+			}
+
+			console.log(data.toJS())
 		} else if (currentStep == 2) {
 			const individuals = data.get('individuals').toJS().slice()
 			console.log(individuals)

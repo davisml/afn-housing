@@ -30,6 +30,9 @@ navigationBackground = linear-gradient(top, afnRed, darken(afnRed, 5%))
 		vertical-align middle
 		margin-bottom 10px
 
+.considerations-list
+	padding-top 20px
+
 .sidebar-item
 	width sidebarWidth
 	text-align center
@@ -48,14 +51,23 @@ navigationBackground = linear-gradient(top, afnRed, darken(afnRed, 5%))
 		width 36px !important
 		height 36px !important
 
+searchWidth = 200px
+
 .forms-search
 	absolute top left bottom
-	width 320px
+	width searchWidth
 	background lighten(rgb(255, 245, 202), 90%)
 	border-right 1px solid rgb(245, 240, 223)
 	z-index 100
 	text-align left
 	padding 10px 0px
+	
+	.search-header
+		height 29px
+		border-bottom 1px solid rgba(0,0,0,0.05)
+		font-weight bold
+		padding 0px 20px
+		background linear-gradient(top, rgba(255,255,255,0.8), rgba(255,255,255,0.0))
 	
 	.search-row
 		padding 10px
@@ -74,7 +86,7 @@ navigationBackground = linear-gradient(top, afnRed, darken(afnRed, 5%))
 				cursor default
 
 .forms-list
-	absolute top left 320px right bottom
+	absolute top left searchWidth right bottom
 	background white
 	z-index 99
 	
@@ -99,12 +111,35 @@ navigationBackground = linear-gradient(top, afnRed, darken(afnRed, 5%))
 						width 36px
 						text-align center
 						vertical-align middle
+						
+					&.children
+						padding-left 15px
+						
+						// .icn
+						// 	width 43px
+				
+				&.status
+					width 10px
+					padding 10px 0px
+					padding-left 15px
+					border-right none
+				
+				&.name
+					padding-left 15px
+					width 220px
 			
 			th
 				padding 10px 20px
 				background rgb(253,253,253)
 				border-right 1px solid rgb(245,245,245)
 				border-bottom 1px solid rgb(245,245,245)
+				
+				&.name
+					padding-left 15px
+				
+				&.status
+					padding 0px
+					border-right none
 			
 			&:active
 				background rgb(253,253,253)
@@ -152,6 +187,104 @@ navigationBackground = linear-gradient(top, afnRed, darken(afnRed, 5%))
 
 #admin-content
 	background white
-	absolute top navigationHeight left bottom right
+	absolute top left bottom right
 	overflow-y auto
 	overflow-x hidden
+	padding-right 20px
+	padding-left 20px
+	
+	.status-btn
+		absolute top 20px right 20px
+		margin-right 0px
+		font-size 16px
+		padding-right 15px
+		background linear-gradient(top, lighten(rgb(254, 206, 4), 40%), rgb(254, 206, 4))
+		color rgb(102, 89, 42)
+		cursor default
+		user-select none
+		
+		i
+			margin-left 10px
+			font-weight 600
+	
+	.individuals-table
+		border-collapse collapse
+		text-align left
+		width 100%
+		max-width 920px
+		border 1px solid rgb(180, 180, 180)
+		margin-top 10px
+		margin-bottom 10px
+		
+		tr
+			td
+				padding 10px
+				font-weight 500
+				border-right 1px solid rgb(180, 180, 180)
+			
+			th
+				padding 10px
+				color rgb(120, 120, 120)
+				font-weight normal
+				text-align left
+				border-bottom 1px solid rgb(180, 180, 180)
+				background rgb(253,253,253)
+				border-right 1px solid rgb(180, 180, 180)
+
+.considerations
+	display flex
+	flex-direction column
+	
+	.consideration
+		padding 10px 0px
+		display flex
+		flex-direction row
+		align-items center
+		// justify-content center
+		
+		.icn
+			display flex
+			flex-direction column
+			// vertical-align middle
+			margin-right 10px
+			min-width 32px
+			align-items center
+		
+		label
+			relative top 5px
+			color rgb(60, 60, 60)
+			font-weight 500
+
+@media print
+	#sidebar
+		display none
+	
+	#app-content
+		left 0px
+		box-shadow none
+	
+	#admin-content
+		left 0px
+		box-shadow none
+		padding 0px
+		
+		.form-group
+			.form-item
+				.form-label
+					color rgb(90,90,90)
+		
+		.status-btn
+			color black
+			border-color rgb(180, 180, 180)
+			background white
+			font-weight normal
+			padding 8px 12px
+			right 0px
+			
+			i
+				display none
+		
+		.individuals-table
+			tr
+				th
+					color rgb(90,90,90)

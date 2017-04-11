@@ -2,6 +2,8 @@ import React from 'react'
 import _ from 'underscore'
 import validateField from './validateField'
 import TextField from '../components/TextField'
+import ClassNames from 'classnames'
+import calculateAge from '../calculateAge'
 
 const ContactForm = ({data, handleChange}) => {
 	const invalid = data.get('invalid')
@@ -17,6 +19,23 @@ const ContactForm = ({data, handleChange}) => {
 
 	const years = _.range(1940, 2018)
 	years.splice(0, 0, 'Year')
+
+	const {birthYear, birthMonth, birthDayOfMonth} = data.toJS()
+
+	const year = Number(birthYear)
+	const month = Number(birthMonth) - 1
+	const day = Number(birthDayOfMonth)
+	const date = new Date(year, month, day)
+
+	const age = calculateAge(date)
+
+	let dateInvalid = false
+
+	if (age < 18 && invalid) {
+		dateInvalid = true
+	}
+
+	let selectClass = ClassNames("form-control", {invalid: dateInvalid})
 
 	return <div className='form-row'>
 		<div className='form-cell-column'>
@@ -47,7 +66,7 @@ const ContactForm = ({data, handleChange}) => {
 					<label htmlFor="telephone">Birthdate</label>
 					<div className="birthdate">
 						<div className="month-cell">
-							<select value={ data.get('birthMonth') } onChange={ handleChange('birthMonth') }>
+							<select className={ selectClass } value={ data.get('birthMonth') } onChange={ handleChange('birthMonth') }>
 								{
 									months.map((option, index) => {
 										let value = index
@@ -62,7 +81,7 @@ const ContactForm = ({data, handleChange}) => {
 							</select>
 						</div>
 						<div className="day-cell">
-							<select value={ data.get('birthDayOfMonth') } onChange={ handleChange('birthDayOfMonth') }>
+							<select className={ selectClass } value={ data.get('birthDayOfMonth') } onChange={ handleChange('birthDayOfMonth') }>
 								{
 									days.map((day) => {
 										let value = day
@@ -77,7 +96,7 @@ const ContactForm = ({data, handleChange}) => {
 							</select>
 						</div>
 						<div className="year-cell">
-							<select value={ data.get('birthYear') } onChange={ handleChange('birthYear') }>
+							<select className={ selectClass } value={ data.get('birthYear') } onChange={ handleChange('birthYear') }>
 								{
 									years.map((year) => {
 										let value = year
