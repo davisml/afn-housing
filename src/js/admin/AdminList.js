@@ -400,7 +400,7 @@ class AppComponent extends React.Component {
 
 		const statusOptions = ['All Forms', 'Approved', 'Pending', 'Rejected'].map((label, index) => {
 			const key = `status-${index}`
-
+			
 			return <option key={ key } value={ index }>{ label }</option>
 		})
 
