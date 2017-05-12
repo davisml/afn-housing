@@ -7,63 +7,33 @@ import decamelize from 'decamelize'
 import Sidebar from './Sidebar'
 import OtherIcon from '../components/OtherIcon'
 import Moment from 'moment'
+import StatusButton from './StatusButton'
 
-class StatusButton extends React.Component {
-	constructor(props) {
-		super(props)
-
-		this.state = {
-			showMenu: false
+const approveForm = (id, message) => Query(`
+	mutation ApproveForm($id: Int) {
+		approveForm(id: $id) {
+			id,
+			approvedAt
 		}
-	}
+	}`,
+{ id })
 
-	render() {
-		const {status, onApprove, onReject} = this.props
-
-		const approve = () => {
-			this.setState({showMenu: false})
-			onApprove()
+const rejectForm = (id, message) => Query(`
+	mutation RejectForm($id: Int) {
+		rejectForm(id: $id) {
+			id,
+			rejectedAt
 		}
-
-		const reject = () => {
-			this.setState({showMenu: false})
-			onReject()
-		}
-
-		let statusMenu = null
-
-		if (this.state.showMenu) {
-			statusMenu = <div className="status-menu">
-				<div className="menu-item approve" onClick={ approve }>Approve</div>
-				<div className="menu-item reject" onClick={ reject }>Reject</div>
-			</div>
-		}
-
-		const showMenu = (event) => {
-			if (status != "Pending") {
-				return
-			}
-
-			if (event.target.className.indexOf('menu-item') >= 0) {
-				return
-			}
-
-			this.setState({showMenu: !this.state.showMenu})
-		}
-
-		const className = ClassNames('btn', 'status-btn', status.toLowerCase())
-
-		return <div className={ className } onClick={ showMenu }>{ status }<i className="fa fa-angle-down"/>{ statusMenu }</div>
-	}
-}
+	}`,
+{ id })
 
 class AdminForm extends React.Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
-			housingForm: null,
-			buttonStatus: 'Pending'
+			housingForm: null
+			// buttonStatus: 'Pending'
 		}
 	}
 
@@ -86,6 +56,8 @@ class AdminForm extends React.Component {
 				      description
 				    }
 				    createdAt
+				    approvedAt
+				    rejectedAt
 				    data {
 				      additionalInformation
 				      currentLivingConditions
@@ -311,20 +283,44 @@ class AdminForm extends React.Component {
 			</div>
 
 			const approveApplication = () => {
-				const approvalMessage = prompt("Enter an approval message", "")
-				// alert('approve')
-				this.setState({ buttonStatus: 'Approved' })
+				const message = prompt("Enter an approval message", "")
+				
+				approveForm(form.id, message).then(({ approveForm }) => {
+					let newForm = _.clone(this.state.housingForm)
+					newForm = _.extend(newForm, approveForm)
+					this.setState({ housingForm: newForm })
+				}).catch((error) => {
+					console.log("Error")
+					console.error(error)
+				})
 			}
 
 			const rejectApplication = () => {
-				const rejectionMessage = prompt("Enter a rejection reason", "")
-				// alert('reject')
-				this.setState({ buttonStatus: 'Rejected' })
+				const message = prompt("Enter a rejection reason", "")
+				
+				rejectForm(form.id, message).then(({ rejectForm }) => {
+					let newForm = _.clone(this.state.housingForm)
+					newForm = _.extend(newForm, rejectForm)
+					this.setState({ housingForm: newForm })
+				}).catch((error) => {
+					console.log("Error")
+					console.error(error)
+				})
+			}
+
+			var buttonStatus = null
+
+			if (form.approvedAt) {
+				buttonStatus = "Approved"
+			} else if (form.rejectedAt) {
+				buttonStatus = "Rejected"
+			} else {
+				buttonStatus = "Pending"
 			}
 
 			infoContent = <div id="admin-content" style={{textAlign: 'left'}}>
 				<h2>{ formTitle }</h2>
-				<StatusButton status={ this.state.buttonStatus } onApprove={ approveApplication } onReject={ rejectApplication } />
+				<StatusButton status={ buttonStatus } onApprove={ approveApplication } onReject={ rejectApplication } />
 				<div className="form-group">
 					{ formRows }
 				</div>

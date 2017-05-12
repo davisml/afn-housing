@@ -20,6 +20,7 @@ class App extends Component {
 ReactDOM.render(<Router history={ browserHistory }>
 	<Route path="/" component={ App }>
 		<IndexRoute component={ Form }/>
+		<Route path="form/:shortid" component={ Form } />
 		<Route path="admin">
 			<Route path="form/:formId" component={ AdminForm }/>
 			<IndexRoute component={ AdminList }/>

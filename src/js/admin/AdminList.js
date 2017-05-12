@@ -12,11 +12,29 @@ import OtherIcon from '../components/OtherIcon'
 import Moment from 'moment'
 
 const StatusIcon = ({ status, width, height, fill }) => {
-	const svgProps = { width, height, viewBox: '0 0 16 16' }
+	const viewBox = {
+		awaiting: '0 0 16 16',
+		approved: '0 0 95 95',
+		rejected: '0 0 77.2 77.2'
+	}[status]
+
+	const svgProps = { width, height, viewBox }
+
+	if (status === "awaiting") {
+		return <svg { ...svgProps }>
+			<path d="M8,0C3.6,0,0,3.6,0,8s3.6,8,8,8s8-3.6,8-8S12.4,0,8,0z M5,9C4.4,9,4,8.6,4,8s0.4-1,1-1c0.6,0,1,0.4,1,1S5.6,9,5,9z M8,9
+			C7.4,9,7,8.6,7,8s0.4-1,1-1c0.6,0,1,0.4,1,1S8.6,9,8,9z M11,9c-0.6,0-1-0.4-1-1s0.4-1,1-1c0.6,0,1,0.4,1,1S11.6,9,11,9z" fill={ fill } />
+		</svg>
+	} else if (status === "rejected") {
+		return <svg { ...svgProps }>
+			<path fill={ fill } d="M77.2,38.6C77.2,17.3,59.9,0,38.6,0S0,17.3,0,38.6s17.3,38.6,38.6,38.6S77.2,59.9,77.2,38.6z M22.4,51.8l13.2-13.2
+	L22.4,25.4l3-3l13.2,13.2l13.2-13.2l3,3L41.6,38.6l13.2,13.2l-3,3L38.6,41.6L25.4,54.8L22.4,51.8z" />
+		</svg>
+	}
 
 	return <svg { ...svgProps }>
-		<path d="M8,0C3.6,0,0,3.6,0,8s3.6,8,8,8s8-3.6,8-8S12.4,0,8,0z M5,9C4.4,9,4,8.6,4,8s0.4-1,1-1c0.6,0,1,0.4,1,1S5.6,9,5,9z M8,9
-		C7.4,9,7,8.6,7,8s0.4-1,1-1c0.6,0,1,0.4,1,1S8.6,9,8,9z M11,9c-0.6,0-1-0.4-1-1s0.4-1,1-1c0.6,0,1,0.4,1,1S11.6,9,11,9z" fill={ fill } />
+		<path d="M47.5,0C21.3,0,0,21.3,0,47.5C0,73.7,21.3,95,47.5,95S95,73.7,95,47.5S73.7,0,47.5,0z M42.1,66.4L22.8,47.1l5.1-5.1
+	l14.2,14.2l28-28l5.1,5.1L42.1,66.4z" fill={ fill } />
 	</svg>
 }
 
@@ -41,6 +59,8 @@ const getLocations = (callback) => {
 				forms {
 					id
 					createdAt
+					rejectedAt
+					approvedAt
 					member {
 						firstName
 						lastName
@@ -235,7 +255,7 @@ class AppComponent extends React.Component {
 			}
 		}
 
-		const renderFormItem = ({ id, member, createdAt: submitDate, location, data, numberOfRooms: familySize }, index) => {
+		const renderFormItem = ({ id, member, createdAt: submitDate, rejectedAt, approvedAt, location, data, numberOfRooms: familySize }, index) => {
 			const {individuals = []} = data
 			const key = `form-item-${ index }`
 			const description = `${ member.firstName } ${ member.lastName }`
@@ -321,14 +341,31 @@ class AppComponent extends React.Component {
 			// 	if (a.type == )
 			// })
 
+			var status = "awaiting"
+
+			if (approvedAt) {
+				status = "approved"
+			} else if (rejectedAt) {
+				status = "rejected"
+			}
+			
+			const statusFills = {
+				awaiting: 'rgb(254, 206, 4)',
+				approved: 'rgb(69, 219, 3)',
+				rejected: 'rgb(209, 36, 3)'
+			}
+			
+			const iconProps = { status, fill: statusFills[status] }
+			const statusIcon = <StatusIcon { ...iconProps } />
+			
 			if (selectedLocation === 0) {
-				console.log(`location: ${ location }`)
-				console.log(locations[location])
+				// console.log(`location: ${ location }`)
+				// console.log(locations[location])
 
 				const locationName = locations[location] ? locations[location].description : ''
 
 				return <tr key={ key } onClick={ handleItemClick(index) }>
-					<td className="status"><StatusIcon status="awaiting" fill="rgb(190,190,190)" /></td>
+					<td className="status">{ statusIcon }</td>
 					<td className="name">{ description }</td>
 					<td style={{width: 140}}>{ locationName }</td>
 					<td style={{width: 200}} className="icon-cell">{ icons }</td>
@@ -339,7 +376,7 @@ class AppComponent extends React.Component {
 			}
 
 			return <tr key={ key } onClick={ handleItemClick(index) }>
-				<td className="status"><StatusIcon status="awaiting" fill="rgb(190,190,190)" /></td>
+				<td className="status">{ statusIcon }</td>
 				<td className="name">{ description }</td>
 				<td className="icon-cell">{ icons }</td>
 				<td className="icon-cell children"><Family people={ sortedIndividuals } /></td>

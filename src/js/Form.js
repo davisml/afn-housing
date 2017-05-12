@@ -22,6 +22,7 @@ class AppComponent extends React.Component {
 		} else {
 			data = new Map({
 				isMember: false,
+				bandNum: '',
 				firstName: '',
 				lastName: '',
 				email: '',
@@ -83,7 +84,7 @@ class AppComponent extends React.Component {
 	render() {
 		const handleSubmit = (input) => {
 			console.log(`handle submit`)
-
+			
 			Query(`
 				mutation SubmitForm($input: HousingFormInput) {
 					submitForm(input: $input) {

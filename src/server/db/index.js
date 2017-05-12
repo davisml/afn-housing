@@ -62,6 +62,18 @@ const HousingForm = db.define('housingForm', {
 	data: {
 		type: Sequelize.JSONB,
 		allowNull: false
+	},
+	uid: {
+		type: Sequelize.STRING,
+		allowNull: false
+	},
+	approvedAt: {
+		type: Sequelize.DATE,
+		allowNull: true
+	},
+	rejectedAt: {
+		type: Sequelize.DATE,
+		allowNull: true
 	}
 })
 

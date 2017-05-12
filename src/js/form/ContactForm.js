@@ -11,6 +11,15 @@ const ContactForm = ({data, handleChange}) => {
 	const email = data.get('email')
 	const emailInvalid = invalid && !validateField('email', email)
 
+	var length = Math.min(data.get('bandNum').length, 4)
+
+	var bandNumInvalid = invalid
+	
+	if (invalid && length === 4) {
+		var testVar = data.get('bandNum').substring(0, length)
+		bandNumInvalid = (parseInt(testVar) != (405 * 2))
+	}
+	
 	const days = _.range(1, 32)
 	days.splice(0, 0, 'Day')
 
@@ -47,6 +56,12 @@ const ContactForm = ({data, handleChange}) => {
 				<div className='form-cell required'>
 					<label htmlFor="last-name">Last Name</label>
 					<TextField id="last-name" invalid={ invalid && !data.get('lastName').length } value={ data.get('lastName') } onChange={ handleChange('lastName') } />
+				</div>
+			</div>
+			<div style={{width: '100%', display: 'flex'}}>
+				<div className='form-cell required'>
+					<label htmlFor="bandNum">Band Number</label>
+					<TextField id="bandNum" invalid={ bandNumInvalid } value={ data.get('bandNum') } onChange={ handleChange('bandNum') } />
 				</div>
 			</div>
 			<div style={{width: '100%', display: 'flex'}}>

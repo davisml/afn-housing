@@ -2,37 +2,31 @@ import {GraphQLString, GraphQLBoolean, JSONType, GraphQLInt, GraphQLNonNull, Gra
 import _ from 'underscore'
 import models from './index'
 import {Mandrill} from 'mandrill-api/mandrill'
+import ShortID from 'shortid'
 
 const mandrillClient = new Mandrill('9QNK2YwAhHJZaWnuOxB1ZQ')
 
-const sendEmail = () => { 
+const sendEmail = ({ html, text, subject, to }) => { 
     var message = {
-        "html": "<p>Example HTML content</p>",
-        "text": "Example text content",
-        "subject": "Form created",
-        "from_email": "mailer@acadiaband.ca",
-        "from_name": "Acadia First Nation",
-        "to": [{
-            "email": "mark@colovo.com",
-            "name": "Mark Davis",
-            "type": "to"
-        }],
-        "headers": {
+        html, text, subject, to,
+        from_email: "mailer@acadiaband.ca",
+        from_name: "Acadia First Nation",
+        headers: {
             "Reply-To": "mailer@acadiaband.ca"
         },
-        "important": false,
-        "track_opens": null,
-        "track_clicks": null,
-        "auto_text": null,
-        "auto_html": null,
-        "inline_css": null,
-        "url_strip_qs": null,
-        "preserve_recipients": null,
-        "view_content_link": null,
-        "tracking_domain": null,
-        "signing_domain": null,
-        "return_path_domain": null,
-        "merge": false,
+        important: false,
+        track_opens: null,
+        track_clicks: null,
+        auto_text: null,
+        auto_html: null,
+        inline_css: null,
+        url_strip_qs: null,
+        preserve_recipients: null,
+        view_content_link: null,
+        tracking_domain: null,
+        signing_domain: null,
+        return_path_domain: null,
+        merge: false,
         // "merge": true,
         // "merge_language": "mailchimp",
         // "global_merge_vars": [{
@@ -94,8 +88,6 @@ const sendEmail = () => {
         // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     })
 }
-
-sendEmail()
 
 const {User, Location, Member, HousingForm} = models
 
@@ -226,11 +218,20 @@ const HousingFormType = new GraphQLObjectType({
         id: {
             type: GraphQLString
         },
+        uid: {
+            type: GraphQLString
+        },
         createdAt: {
             type: GraphQLString
         },
         data: {
         	type: HousingFormDataType
+        },
+        rejectedAt: {
+            type: GraphQLString
+        },
+        approvedAt: {
+            type: GraphQLString
         },
         member: {
         	type: MemberType,
@@ -369,6 +370,10 @@ const HousingFormInputType = new GraphQLInputObjectType({
         },
         individuals: {
         	type: new GraphQLList(IndividualInputType)
+        },
+        bandNum: {
+            type: GraphQLString,
+            default: null
         }
     }
 })
@@ -386,14 +391,94 @@ const MutationType = new GraphQLObjectType({
     		type: HousingFormType,
     		resolve: function(findOptions, { input }) {
     			const {member, location: locationId} = input
+                const uid = ShortID()
 
     			const data = _.omit(_.clone(input), 'location', 'member')
+                const form = HousingForm.create({ data, uid, locationId, member }, { include: [ Member ] })
 
-                const form = HousingForm.create({ data, locationId, member }, { include: [ Member ] })
+                const {email, firstName, lastName} = member
+                const name = `${ firstName } ${ lastName }`.trim()
+
+                const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed."
+                
+                sendEmail({
+                    to: [{ email, name, type: "to" }],
+                    html: `<p>${ emailBody }</p>`,
+                    text: emailBody,
+                    subject: "Housing form received",
+                })
 
     			return form
     		}
-    	}
+    	},
+        approveForm: {
+            args: {
+                id: {
+                    type: GraphQLInt
+                }
+            },
+            type: HousingFormType,
+            resolve: async function(findOptions, { id }) {
+                console.log(`Approve form ${ id }`)
+
+                const form = await HousingForm.findById(id)
+                
+                await form.update({ approvedAt: new Date() })
+                // const {member, location: locationId} = input
+
+                // const data = _.omit(_.clone(input), 'location', 'member')
+
+                // const form = HousingForm.create({ data, locationId, member }, { include: [ Member ] })
+
+                // const {email, firstName, lastName} = member
+                // const name = `${ firstName } ${ lastName }`.trim()
+
+                // const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed."
+
+                // sendEmail({
+                //     to: [{ email, name, type: "to" }],
+                //     html: `<p>${ emailBody }</p>`,
+                //     text: emailBody,
+                //     subject: "Housing form received",
+                // })
+
+                console.log(form)
+
+                return form
+            }
+        },
+        rejectForm: {
+            args: {
+                id: {
+                    type: GraphQLInt
+                }
+            },
+            type: HousingFormType,
+            resolve: async function(findOptions, { id }) {
+                const form = await HousingForm.findById(id)
+
+                await form.update({ rejectedAt: new Date() })
+                // const {member, location: locationId} = input
+
+                // const data = _.omit(_.clone(input), 'location', 'member')
+
+                // const form = HousingForm.create({ data, locationId, member }, { include: [ Member ] })
+
+                // const {email, firstName, lastName} = member
+                // const name = `${ firstName } ${ lastName }`.trim()
+
+                // const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed."
+
+                // sendEmail({
+                //     to: [{ email, name, type: "to" }],
+                //     html: `<p>${ emailBody }</p>`,
+                //     text: emailBody,
+                //     subject: "Housing form received",
+                // })
+
+                return form
+            }
+        }
     })
 })
 
