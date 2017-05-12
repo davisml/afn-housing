@@ -17,29 +17,36 @@ class AppComponent extends React.Component {
 
 		const savedDataString = localStorage.getItem('formData')
 
-		if (savedDataString) {
-			data = fromJS(JSON.parse(savedDataString))
+		if (!this.props.params || !this.props.params.shortid) {
+			if (savedDataString) {
+				data = fromJS(JSON.parse(savedDataString))
+			} else {
+				data = new Map({
+					isMember: false,
+					bandNum: '',
+					firstName: '',
+					lastName: '',
+					email: '',
+					telephone: '',
+					location: 1,
+					birthDayOfMonth: -1,
+					birthYear: -1,
+					birthMonth: -1,
+					currentLivingConditions: '',
+					isLivingOnReserve: false,
+					isConsideredElder: false,
+					residesWithDisabled: false,
+					requiresSupport: false,
+					additionalInformation: '',
+					numberOfIndividuals,
+					individuals: this.initList(new List(), numberOfIndividuals)
+				})
+			}
 		} else {
-			data = new Map({
-				isMember: false,
-				bandNum: '',
-				firstName: '',
-				lastName: '',
-				email: '',
-				telephone: '',
-				location: 1,
-				birthDayOfMonth: -1,
-				birthYear: -1,
-				birthMonth: -1,
-				currentLivingConditions: '',
-				isLivingOnReserve: false,
-				isConsideredElder: false,
-				residesWithDisabled: false,
-				requiresSupport: false,
-				additionalInformation: '',
-				numberOfIndividuals,
-				individuals: this.initList(new List(), numberOfIndividuals)
-			})
+			const {shortid} = this.props.params
+
+			console.log('fetch form for short id')
+			console.log(shortid)
 		}
 
 		this.state = {
@@ -51,12 +58,12 @@ class AppComponent extends React.Component {
 		console.log("Component did mount")
 
 		Query(`
-		query {
-			locations {
-				id
-				description
+			query {
+				locations {
+					id
+					description
+				}
 			}
-		}
 		`).then((data) => {
 			console.log(`query complete`)
 			console.log(data)
@@ -115,7 +122,9 @@ class AppComponent extends React.Component {
 				})
 			}
 
-			localStorage.setItem('formData', JSON.stringify(newData.toJS()))
+			let saveData = newData.set('invalid', false)
+			
+			localStorage.setItem('formData', JSON.stringify(saveData.toJS()))
 
 			this.setState({ data: newData })
 		}

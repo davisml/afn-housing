@@ -88,7 +88,7 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		let valid = true
 
 		if (currentStep == 0) {
-			['firstName', 'lastName', 'email', 'telephone'].forEach((key) => {
+			['firstName', 'lastName', 'email', 'telephone', 'bandNum'].forEach((key) => {
 				const value = data.get(key)
 
 				if (!validateField(key, value)) {
@@ -101,19 +101,21 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 			
 			const {birthYear, birthMonth, birthDayOfMonth} = data.toJS()
 
-			const year = Number(birthYear)
-			const month = Number(birthMonth) - 1
-			const day = Number(birthDayOfMonth)
-			const date = new Date(year, month, day)
-
-			const age = calculateAge(date)
-
-			if (age < 18) {
-				// console.log(`age is invalid ${ age }`)
+			if (birthYear < 0 || birthMonth < 0 || birthDayOfMonth < 0) {
 				valid = false
-			}
+			} else {
+				const year = Number(birthYear)
+				const month = Number(birthMonth) - 1
+				const day = Number(birthDayOfMonth)
+				const date = new Date(year, month, day)
 
-			console.log(data.toJS())
+				const age = calculateAge(date)
+
+				if (age < 18) {
+					// console.log(`age is invalid ${ age }`)
+					valid = false
+				}
+			}
 		} else if (currentStep == 2) {
 			const individuals = data.get('individuals').toJS().slice()
 			console.log(individuals)

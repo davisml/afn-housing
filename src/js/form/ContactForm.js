@@ -9,17 +9,10 @@ const ContactForm = ({data, handleChange}) => {
 	const invalid = data.get('invalid')
 
 	const email = data.get('email')
+	const bandNum = data.get('bandNum')
 	const emailInvalid = invalid && !validateField('email', email)
+	const bandNumInvalid = invalid && !validateField('bandNum', bandNum)
 
-	var length = Math.min(data.get('bandNum').length, 4)
-
-	var bandNumInvalid = invalid
-	
-	if (invalid && length === 4) {
-		var testVar = data.get('bandNum').substring(0, length)
-		bandNumInvalid = (parseInt(testVar) != (405 * 2))
-	}
-	
 	const days = _.range(1, 32)
 	days.splice(0, 0, 'Day')
 
@@ -31,17 +24,23 @@ const ContactForm = ({data, handleChange}) => {
 
 	const {birthYear, birthMonth, birthDayOfMonth} = data.toJS()
 
-	const year = Number(birthYear)
-	const month = Number(birthMonth) - 1
-	const day = Number(birthDayOfMonth)
-	const date = new Date(year, month, day)
-
-	const age = calculateAge(date)
-
 	let dateInvalid = false
 
-	if (age < 18 && invalid) {
-		dateInvalid = true
+	if (invalid) {
+		if (birthYear < 0 || birthMonth < 0 || birthDayOfMonth < 0) {
+			dateInvalid = true
+		} else {
+			const year = Number(birthYear)
+			const month = Number(birthMonth) - 1
+			const day = Number(birthDayOfMonth)
+			const date = new Date(year, month, day)
+
+			const age = calculateAge(date)
+
+			if (age < 18) {
+				dateInvalid = true
+			}
+		}
 	}
 
 	let selectClass = ClassNames("form-control", {invalid: dateInvalid})

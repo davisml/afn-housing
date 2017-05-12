@@ -19,13 +19,13 @@ const approveForm = (id, message) => Query(`
 { id })
 
 const rejectForm = (id, message) => Query(`
-	mutation RejectForm($id: Int) {
-		rejectForm(id: $id) {
+	mutation RejectForm($id: Int, $message: String) {
+		rejectForm(id: $id, message: $message) {
 			id,
 			rejectedAt
 		}
 	}`,
-{ id })
+{ id, message })
 
 class AdminForm extends React.Component {
 	constructor(props) {
@@ -59,6 +59,7 @@ class AdminForm extends React.Component {
 				    approvedAt
 				    rejectedAt
 				    data {
+				      bandNum
 				      additionalInformation
 				      currentLivingConditions
 				      isConsideredElder

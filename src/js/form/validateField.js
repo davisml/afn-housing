@@ -4,6 +4,22 @@ const validateField = (key, value) => {
 	if (!value) {
 		return false
 	}
+	
+	if (key == 'bandNum') {
+		if (value.length < 5) {
+			return false
+		}
+
+		var length = Math.min(value.length, 4)
+		var bandNumInvalid = true
+
+		if (length === 4) {
+			var testVar = value.substring(0, length)
+			bandNumInvalid = (parseInt(testVar) != (405 * 2))
+		}
+
+		return !bandNumInvalid
+	}
 
 	if (key == 'email' && !emailRegex.test(value)) {
 		return false

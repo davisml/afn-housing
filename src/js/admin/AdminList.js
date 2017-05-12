@@ -123,7 +123,7 @@ class AppComponent extends React.Component {
 		const {router, location} = this.props
 		const query = _.extend(_.clone(location.query), params)
 
-		console.log(query)
+		// console.log(query)
 
 		const encodePair = (key, value) => `${ encodeURIComponent(key) }=${ encodeURIComponent(value) }`
 
@@ -131,7 +131,7 @@ class AppComponent extends React.Component {
 
 		const url = `/admin?${ queryString }`
 
-		console.log(`url: ${ url }`)
+		// console.log(`url: ${ url }`)
 
 		router.replace(url)
 	}
@@ -297,8 +297,8 @@ class AppComponent extends React.Component {
 
 				const {relationship} = individual
 
-				console.log(individual)
-				console.log(relationship)
+				// console.log(individual)
+				// console.log(relationship)
 
 				if (relationship == "son" || relationship == "child") {
 					rank = 1
@@ -348,16 +348,16 @@ class AppComponent extends React.Component {
 			} else if (rejectedAt) {
 				status = "rejected"
 			}
-			
+
 			const statusFills = {
 				awaiting: 'rgb(254, 206, 4)',
 				approved: 'rgb(69, 219, 3)',
 				rejected: 'rgb(209, 36, 3)'
 			}
-			
+
 			const iconProps = { status, fill: statusFills[status] }
 			const statusIcon = <StatusIcon { ...iconProps } />
-			
+
 			if (selectedLocation === 0) {
 				// console.log(`location: ${ location }`)
 				// console.log(locations[location])
@@ -440,9 +440,13 @@ class AppComponent extends React.Component {
 			
 			return <option key={ key } value={ index }>{ label }</option>
 		})
+		
+		const logout = () => {
+			window.location.href = 'http://housingapp.acadiafirstnation.ca/logout'
+		}
 
 		return <div id="admin">
-			<Sidebar />
+			<Sidebar onLogout={ logout }/>
 			<div id="app-content">
 				<div id="admin-content">
 					<div className="forms-search">

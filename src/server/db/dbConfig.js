@@ -9,10 +9,10 @@
 // }
 
 const dbConfig = {
-	user: 'fbevnzetaoxyxi', //env var: PGUSER
-	database: 'd7dq6p53at8c88', //env var: PGDATABASE
-	password: '10f60293afb500c1a3827a255d7f5710d5821b66d6248777dc745f9564470d90', //env var: PGPASSWORD
-	host: 'ec2-54-235-240-92.compute-1.amazonaws.com', // Server hosting the postgres database
+	user: 'sadgvcctkeiexm', //env var: PGUSER
+	database: 'd6kn3jvcvpl4pa', //env var: PGDATABASE
+	password: 'f8d3fd4aa6b78cedd97ceb50edfffe8aca4bbf32204321d5764c92628b575e44', //env var: PGPASSWORD
+	host: 'ec2-23-21-220-23.compute-1.amazonaws.com', // Server hosting the postgres database
 	port: 5432, //env var: PGPORT
 	idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed
 	ssl: true

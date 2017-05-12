@@ -6,6 +6,62 @@ import ShortID from 'shortid'
 
 const mandrillClient = new Mandrill('9QNK2YwAhHJZaWnuOxB1ZQ')
 
+const {User, Location, Member, HousingForm} = models
+
+async function addLocations() {
+    const results = await Location.findAll()
+
+    console.log('results')
+    console.log(results)
+
+    if (results.length === 0) {
+        console.log("Create locations!!")
+
+        try {
+            const locations = [
+                {
+                    description: "Gold River",
+                    coordinates: ""
+                },
+                {
+                    description: "Medway",
+                    coordinates: ""
+                },
+                {
+                    description: "Ponhook",
+                    coordinates: ""
+                },
+                {
+                    description: "Wildcat",
+                    coordinates: ""
+                },
+                {
+                    description: "Yarmouth",
+                    coordinates: ""
+                }
+            ]
+
+            const locationResult = await Promise.all(locations.map((location) => {
+                return Location.create(location)
+            }))
+
+            // const createResult = await Location.bulkCreate(, { individualHooks: true })
+
+            console.log(locationResult)
+        }
+        catch(error) {
+            console.log("Error")
+            console.error(error)
+        }
+
+        console.log(createResult)
+    }
+}
+
+addLocations().then(() => {
+    console.log('done')
+})
+
 const sendEmail = ({ html, text, subject, to }) => { 
     var message = {
         html, text, subject, to,
@@ -88,8 +144,6 @@ const sendEmail = ({ html, text, subject, to }) => {
         // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     })
 }
-
-const {User, Location, Member, HousingForm} = models
 
 const UserType = new GraphQLObjectType({
     name: 'UserType',
@@ -208,6 +262,9 @@ const HousingFormDataType = new GraphQLObjectType({
         },
         birthDate: {
             type: GraphQLString
+        },
+        bandNum: {
+            type: GraphQLString
         }
 	}
 })
@@ -263,6 +320,20 @@ graphFields.housingForm = {
         }
     },
     resolve: (parent, { id }) => HousingForm.findById(id)
+}
+
+graphFields.housingFormWithShortId = {
+    type: HousingFormType,
+    args: {
+        shortid: {
+            type: GraphQLString
+        }
+    },
+    resolve: (parent, { shortid }) => {
+        HousingForm.findOne({
+            where: { shortid }
+        })
+    }
 }
 
 graphFields.locations = {
@@ -378,6 +449,8 @@ const HousingFormInputType = new GraphQLInputObjectType({
     }
 })
 
+const getFormURL = (uid) => `http://housingapp.acadiafirstnation.ca/form/${ uid }`
+
 const MutationType = new GraphQLObjectType({
     name: `${ name }Mutations`,
     description: `The root of all ${ name } mutations`,
@@ -396,11 +469,19 @@ const MutationType = new GraphQLObjectType({
     			const data = _.omit(_.clone(input), 'location', 'member')
                 const form = HousingForm.create({ data, uid, locationId, member }, { include: [ Member ] })
 
+                const formURL = getFormURL(uid)
                 const {email, firstName, lastName} = member
                 const name = `${ firstName } ${ lastName }`.trim()
 
-                const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed."
-                
+                const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed.\n\nTo update your form use the url below:\n\n" + formURL
+
+                // IF THE BAND NUMBER ALREADY EXISTS IN THE DATABASE
+                // AND THAT FORM IS STILL PENDING – SEND EMAIL / SHOW ON SCREEN:
+                // "We currently have a pending application associated with the provided band number:"
+                // [ show_band_number ]
+                // "If you have previously submitted an application, please check your email."
+                // "If you have questions contact the band."
+
                 sendEmail({
                     to: [{ email, name, type: "to" }],
                     html: `<p>${ emailBody }</p>`,
@@ -421,28 +502,26 @@ const MutationType = new GraphQLObjectType({
             resolve: async function(findOptions, { id }) {
                 console.log(`Approve form ${ id }`)
 
-                const form = await HousingForm.findById(id)
+                const form = await HousingForm.findById(id, {
+                    include: [
+                        { model: Member, required: true }
+                    ]
+                })
                 
                 await form.update({ approvedAt: new Date() })
-                // const {member, location: locationId} = input
+                
+                const {member} = form
+                const {email, firstName, lastName} = member
+                const name = `${ firstName } ${ lastName }`.trim()
 
-                // const data = _.omit(_.clone(input), 'location', 'member')
+                const emailBody = "Your housing form has been approved."
 
-                // const form = HousingForm.create({ data, locationId, member }, { include: [ Member ] })
-
-                // const {email, firstName, lastName} = member
-                // const name = `${ firstName } ${ lastName }`.trim()
-
-                // const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed."
-
-                // sendEmail({
-                //     to: [{ email, name, type: "to" }],
-                //     html: `<p>${ emailBody }</p>`,
-                //     text: emailBody,
-                //     subject: "Housing form received",
-                // })
-
-                console.log(form)
+                sendEmail({
+                    to: [{ email, name, type: "to" }],
+                    html: `<p>${ emailBody }</p>`,
+                    text: emailBody,
+                    subject: "Housing form approved",
+                })
 
                 return form
             }
@@ -451,30 +530,51 @@ const MutationType = new GraphQLObjectType({
             args: {
                 id: {
                     type: GraphQLInt
+                },
+                message: {
+                    type: GraphQLString
                 }
             },
             type: HousingFormType,
-            resolve: async function(findOptions, { id }) {
-                const form = await HousingForm.findById(id)
+            resolve: async function(findOptions, { id, message }) {
+                var form = null
 
-                await form.update({ rejectedAt: new Date() })
-                // const {member, location: locationId} = input
+                try {
+                    form = await HousingForm.findById(id, {
+                        include: [
+                            { model: Member, required: true }
+                        ]
+                    })
 
-                // const data = _.omit(_.clone(input), 'location', 'member')
+                    await form.update({ rejectedAt: new Date() })
+                    
+                    console.log('send email (rejection)')
+                    const {member, uid} = form
+                    const {email, firstName, lastName} = member
+                    const name = `${ firstName } ${ lastName }`.trim()
 
-                // const form = HousingForm.create({ data, locationId, member }, { include: [ Member ] })
+                    const formURL = getFormURL(uid)
+                    const emailBody = "Your housing form has been rejected.\n" + rejectionMessage + "\n\nYou may resubmit your form by clicking below:\n\n" + formURL
 
-                // const {email, firstName, lastName} = member
-                // const name = `${ firstName } ${ lastName }`.trim()
+                    const emailHTML = `
+                        <p>Your housing form has been rejected.</p>
+                        <p>${ rejectionMessage }</p>
+                        <p>You may resubmit your form by clicking below:</p>
+                        <a href=${ JSON.stringify(formURL) }>${ formURL }</a>
+                    `
 
-                // const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed."
+                    sendEmail({
+                        to: [{ email, name, type: "to" }],
+                        html: emailHTML,
+                        text: emailBody,
+                        subject: "Housing form rejected",
+                    })
+                }
 
-                // sendEmail({
-                //     to: [{ email, name, type: "to" }],
-                //     html: `<p>${ emailBody }</p>`,
-                //     text: emailBody,
-                //     subject: "Housing form received",
-                // })
+                catch(error) {
+                    console.log("REJECT FAILED")
+                    console.error(error)
+                }
 
                 return form
             }
