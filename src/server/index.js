@@ -10,6 +10,21 @@ const app = express()
 app.set('view engine', 'jade')
 app.set('views', './src/jade')
 
+const env = process.env.NODE_ENV || 'development'
+
+const forceSsl = (req, res, next) => {
+	if (req.headers['x-forwarded-proto'] !== 'https') {
+		return res.redirect(['https://', req.get('Host'), req.url].join(''))
+	}
+
+    return next()
+}
+
+if (env === 'production') {
+	console.log('force ssl')
+    app.use(forceSsl)
+}
+
 const indexTemplate = 'index'
 const renderIndex = (request, response) => response.render(indexTemplate)
 
@@ -52,7 +67,7 @@ async function setupAuth() {
 			'WWW-Authenticate': `Basic realm=${ JSON.stringify(realm) }`
 		}).send('Logged out')
 	})
-	
+
 	app.get('/*', renderIndex)
 }
 

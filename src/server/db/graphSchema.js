@@ -11,11 +11,11 @@ const {User, Location, Member, HousingForm} = models
 async function addLocations() {
     const results = await Location.findAll()
 
-    console.log('results')
-    console.log(results)
+    // console.log('results')
+    // console.log(results)
 
     if (results.length === 0) {
-        console.log("Create locations!!")
+        // console.log("Create locations!!")
 
         try {
             const locations = [
@@ -47,19 +47,19 @@ async function addLocations() {
 
             // const createResult = await Location.bulkCreate(, { individualHooks: true })
 
-            console.log(locationResult)
+            // console.log(locationResult)
         }
         catch(error) {
             console.log("Error")
             console.error(error)
         }
 
-        console.log(createResult)
+        // console.log(createResult)
     }
 }
 
 addLocations().then(() => {
-    console.log('done')
+    // console.log('done')
 })
 
 const sendEmail = ({ html, text, subject, to }) => { 
