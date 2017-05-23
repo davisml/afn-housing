@@ -28,6 +28,10 @@ const User = db.define('user', {
 	}
 }, { paranoid })
 
+// marie falls (mariefalls@acadiaband.ca)
+// joeseph falls (jfalls@acadiaband.ca)
+// jim pictou (jimpictou@)
+
 const Location = db.define('location', {
 	description: {
 		type: Sequelize.STRING,
@@ -55,6 +59,14 @@ const Member = db.define('member', {
 	phone: {
 		type: Sequelize.STRING,
 		allowNull: false
+	},
+	scisID: {
+		type: Sequelize.STRING,
+		allowNull: false
+	},
+	birthDate: {
+		type: Sequelize.DATE,
+		defaultValue: null
 	}
 })
 

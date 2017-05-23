@@ -50,6 +50,8 @@ class AdminForm extends React.Component {
 				      lastName
 				      email
 				      phone
+				      birthDate
+				      scisID
 				    }
 				    location {
 				      id
@@ -59,7 +61,6 @@ class AdminForm extends React.Component {
 				    approvedAt
 				    rejectedAt
 				    data {
-				      bandNum
 				      additionalInformation
 				      currentLivingConditions
 				      isConsideredElder
@@ -68,7 +69,6 @@ class AdminForm extends React.Component {
 				      requiresSupport
 				      residesWithDisabled
 				      disabilityConsideration
-				      birthDate
 				      individuals {
 					    name
 					    age

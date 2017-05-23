@@ -34,17 +34,14 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 	const numberOfSteps = tabs.length
 
 	const finish = () => {
-		// alert('done')
 		console.log("Submit")
 
 		let formData = data.toJS()
 
-		// console.log(data.toJS())
-
-		const {firstName, lastName, email, telephone} = formData
+		const {firstName, lastName, email, telephone, scisID} = formData
 
 		formData.member = {
-			firstName, lastName, email, telephone
+			firstName, lastName, email, telephone, scisID
 		}
 
 		delete formData.firstName
@@ -88,9 +85,9 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		let valid = true
 
 		if (currentStep == 0) {
-			['firstName', 'lastName', 'email', 'telephone', 'bandNum'].forEach((key) => {
+			['firstName', 'lastName', 'email', 'telephone', 'scisID'].forEach((key) => {
 				const value = data.get(key)
-
+				
 				if (!validateField(key, value)) {
 					console.log(`${ key } is invalid`)
 					valid = false

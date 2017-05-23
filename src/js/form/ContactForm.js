@@ -9,9 +9,9 @@ const ContactForm = ({data, handleChange}) => {
 	const invalid = data.get('invalid')
 
 	const email = data.get('email')
-	const bandNum = data.get('bandNum')
+	const scisID = data.get('scisID')
 	const emailInvalid = invalid && !validateField('email', email)
-	const bandNumInvalid = invalid && !validateField('bandNum', bandNum)
+	const scisIDInvalid = invalid && !validateField('scisID', scisID)
 
 	const days = _.range(1, 32)
 	days.splice(0, 0, 'Day')
@@ -59,8 +59,8 @@ const ContactForm = ({data, handleChange}) => {
 			</div>
 			<div style={{width: '100%', display: 'flex'}}>
 				<div className='form-cell required'>
-					<label htmlFor="bandNum">Band Number</label>
-					<TextField id="bandNum" invalid={ bandNumInvalid } value={ data.get('bandNum') } onChange={ handleChange('bandNum') } />
+					<label htmlFor="scisID">Band Number</label>
+					<TextField id="scisID" invalid={ scisIDInvalid } value={ data.get('scisID') } onChange={ handleChange('scisID') } />
 				</div>
 			</div>
 			<div style={{width: '100%', display: 'flex'}}>

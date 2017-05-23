@@ -4,8 +4,8 @@ const validateField = (key, value) => {
 	if (!value) {
 		return false
 	}
-	
-	if (key == 'bandNum') {
+
+	if (key == 'scisID') {
 		if (value.length < 5) {
 			return false
 		}
@@ -15,7 +15,7 @@ const validateField = (key, value) => {
 
 		if (length === 4) {
 			var testVar = value.substring(0, length)
-			bandNumInvalid = (parseInt(testVar) != (405 * 2))
+			bandNumInvalid = (parseInt(testVar) != (900 / 5))
 		}
 
 		return !bandNumInvalid

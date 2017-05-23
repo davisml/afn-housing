@@ -9,14 +9,9 @@ const mandrillClient = new Mandrill('9QNK2YwAhHJZaWnuOxB1ZQ')
 const {User, Location, Member, HousingForm} = models
 
 async function addLocations() {
-    const results = await Location.findAll()
-
-    // console.log('results')
-    // console.log(results)
-
-    if (results.length === 0) {
-        // console.log("Create locations!!")
-
+    const {count} = await Location.findAndCountAll()
+    
+    if (count === 0) {
         try {
             const locations = [
                 {
@@ -40,6 +35,8 @@ async function addLocations() {
                     coordinates: ""
                 }
             ]
+
+            console.log("Create locations")
 
             const locationResult = await Promise.all(locations.map((location) => {
                 return Location.create(location)
@@ -197,6 +194,9 @@ const MemberType = new GraphQLObjectType({
 	name: 'MemberType',
 	fields: {
         id: {
+            type: GraphQLInt
+        },
+        scisID: {
             type: GraphQLString
         },
         firstName: {
@@ -209,6 +209,9 @@ const MemberType = new GraphQLObjectType({
             type: GraphQLString
         },
         phone: {
+            type: GraphQLString
+        },
+        birthDate: {
             type: GraphQLString
         }
     }
@@ -259,12 +262,6 @@ const HousingFormDataType = new GraphQLObjectType({
         },
         individuals: {
         	type: new GraphQLList(IndividualType)
-        },
-        birthDate: {
-            type: GraphQLString
-        },
-        bandNum: {
-            type: GraphQLString
         }
 	}
 })
@@ -329,9 +326,9 @@ graphFields.housingFormWithShortId = {
             type: GraphQLString
         }
     },
-    resolve: (parent, { shortid }) => {
-        HousingForm.findOne({
-            where: { shortid }
+    resolve: (parent, { shortid: uid }) => {
+        return HousingForm.findOne({
+            where: { uid }
         })
     }
 }
@@ -377,6 +374,12 @@ const IndividualInputType = new GraphQLInputObjectType({
 const MemberInputType = new GraphQLInputObjectType({
 	name: 'MemberInput',
 	fields: {
+        id: {
+            type: GraphQLInt
+        },
+        scisID: {
+            type: GraphQLString
+        },
 		firstName: {
 			type: GraphQLString
 		},
@@ -388,7 +391,11 @@ const MemberInputType = new GraphQLInputObjectType({
 		},
 		phone: {
 			type: GraphQLString
-		}
+		},
+        birthDate: {
+            type: GraphQLString,
+            default: null
+        }
 	}
 })
 
@@ -435,21 +442,13 @@ const HousingFormInputType = new GraphQLInputObjectType({
         	type: GraphQLString,
         	default: null
         },
-        birthDate: {
-            type: GraphQLString,
-            default: null
-        },
         individuals: {
         	type: new GraphQLList(IndividualInputType)
-        },
-        bandNum: {
-            type: GraphQLString,
-            default: null
         }
     }
 })
 
-const getFormURL = (uid) => `http://housingapp.acadiafirstnation.ca/form/${ uid }`
+const getFormURL = (uid) => `https://housingapp.acadiafirstnation.ca/form/${ uid }`
 
 const MutationType = new GraphQLObjectType({
     name: `${ name }Mutations`,

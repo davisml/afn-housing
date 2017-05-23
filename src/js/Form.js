@@ -6,24 +6,25 @@ import Request from 'superagent'
 import {getURLParams} from './helpers'
 import Query from './Query'
 import CompleteView from './CompleteView'
+import Moment from 'moment'
 
 class AppComponent extends React.Component {
 	constructor(props) {
 		super(props)
 
-		const numberOfIndividuals = 2
-
 		let data = null
 
-		const savedDataString = localStorage.getItem('formData')
-
 		if (!this.props.params || !this.props.params.shortid) {
+			const savedDataString = localStorage.getItem('formData')
+
 			if (savedDataString) {
 				data = fromJS(JSON.parse(savedDataString))
 			} else {
+				const numberOfIndividuals = 2
+
 				data = new Map({
 					isMember: false,
-					bandNum: '',
+					scisID: '',
 					firstName: '',
 					lastName: '',
 					email: '',
@@ -42,34 +43,99 @@ class AppComponent extends React.Component {
 					individuals: this.initList(new List(), numberOfIndividuals)
 				})
 			}
-		} else {
-			const {shortid} = this.props.params
-
-			console.log('fetch form for short id')
-			console.log(shortid)
 		}
 
-		this.state = {
-			data
-		}
+		this.state = { data }
 	}
 
 	componentDidMount() {
 		console.log("Component did mount")
 
-		Query(`
-			query {
-				locations {
-					id
-					description
-				}
-			}
-		`).then((data) => {
-			console.log(`query complete`)
-			console.log(data)
+		const locationsQuery = `locations {
+			id
+			description
+		}`
 
-			const {locations} = data
-			const newData = this.state.data.merge({ locations })
+		let formQuery = ''
+		let queryName = ''
+		let uid = null
+
+		const fetchForm = (!this.state.data)
+
+		if (fetchForm) {
+			console.log('fetch form')
+			const {shortid} = this.props.params
+
+			formQuery = `housingFormWithShortId(shortid: $uid) {
+			    id
+			    createdAt
+			    location {
+			      id
+			      description
+			    }
+			    member {
+			      id
+			      phone
+			      firstName
+			      lastName
+			      email
+			      scisID
+			      birthDate
+			    }
+			    data {
+			      disabilityConsideration
+			      individuals {
+			        name
+			        relationship
+			        age
+			      }
+			      isConsideredElder
+			      residesWithDisabled
+			      requiresSupport
+			      isLivingOnReserve
+			      additionalInformation
+			      currentLivingConditions
+			    }
+			}`
+
+			console.log('fetch form for short id')
+			console.log(shortid)
+
+			uid = shortid
+			queryName = 'DataQuery($uid: String) '
+		}
+
+		console.log('uid')
+		// console.log(uid)
+
+		Query(`
+			query ${ queryName }{
+				${ locationsQuery }
+				${ formQuery }
+			}
+		`, { uid }).then((data) => {
+			console.log(`query complete`)
+			// console.log(data)
+
+			const {locations, housingFormWithShortId} = data
+			let newData = (this.state.data || new Map).merge({ locations })
+
+			if (housingFormWithShortId) {
+				newData = newData.mergeDeep(housingFormWithShortId.data)
+				newData = newData.mergeDeep(housingFormWithShortId.member)
+				newData = newData.set('telephone', newData.get('phone'))
+				newData = newData.delete('phone')
+
+				let date = Moment(newData.get('birthDate'))
+
+				newData = newData.set('birthMonth', date.month() + 1)
+				newData = newData.set('birthYear', date.year())
+				newData = newData.set('birthDayOfMonth', date.date())
+				newData = newData.set('numberOfIndividuals', newData.get('individuals').size)
+			}
+
+			console.log(newData.toJS())
+
 			this.setState({ data: newData })
 		})
 	}
@@ -89,6 +155,10 @@ class AppComponent extends React.Component {
 	}
 
 	render() {
+		if (!this.state.data) {
+			return <div id="form" />
+		}
+
 		const handleSubmit = (input) => {
 			console.log(`handle submit`)
 			
@@ -123,7 +193,7 @@ class AppComponent extends React.Component {
 			}
 
 			let saveData = newData.set('invalid', false)
-			
+
 			localStorage.setItem('formData', JSON.stringify(saveData.toJS()))
 
 			this.setState({ data: newData })
