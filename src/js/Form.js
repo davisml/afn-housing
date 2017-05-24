@@ -238,6 +238,9 @@ class AppComponent extends React.Component {
 		let content = <FormComponent { ...componentProps } />
 
 		if (this.state.complete) {
+			console.log("We are complete")
+			console.log(data.toJS())
+
 			const fullName = data.get('firstName') + ' ' + data.get('lastName')
 
 			content = <CompleteView name={ fullName }/>

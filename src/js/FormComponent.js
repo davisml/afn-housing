@@ -49,6 +49,9 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		delete formData.email
 		delete formData.telephone
 		delete formData.invalid
+		delete formData.scisID
+		delete formData.id
+		// delete formData.birthDate
 		
 		delete formData.locations
 		delete formData.numberOfIndividuals
@@ -72,7 +75,8 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		console.log(`birth date`)
 		console.log(date)
 
-		formData.birthDate = date
+		formData.member.birthDate = date
+		delete formData.birthDate
 		delete formData.birthYear
 		delete formData.birthMonth
 		delete formData.birthDayOfMonth
@@ -87,7 +91,7 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		if (currentStep == 0) {
 			['firstName', 'lastName', 'email', 'telephone', 'scisID'].forEach((key) => {
 				const value = data.get(key)
-				
+
 				if (!validateField(key, value)) {
 					console.log(`${ key } is invalid`)
 					valid = false

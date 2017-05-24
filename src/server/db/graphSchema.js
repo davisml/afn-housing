@@ -461,12 +461,27 @@ const MutationType = new GraphQLObjectType({
     			}
     		},
     		type: HousingFormType,
-    		resolve: function(findOptions, { input }) {
-    			const {member, location: locationId} = input
+    		resolve: async function(findOptions, { input }) {
+    			const {location: locationId} = input
                 const uid = ShortID()
 
+                const {scisID} = input.member
+
+                let member = await Member.findOne({
+                    where: {
+                        scisID
+                    }
+                })
+
+                console.log("Found member")
+                console.log(member)
+                
+                if (!member) {
+                    member = input.member
+                }
+
     			const data = _.omit(_.clone(input), 'location', 'member')
-                const form = HousingForm.create({ data, uid, locationId, member }, { include: [ Member ] })
+                const form = await HousingForm.create({ data, uid, locationId, member }, { include: [ Member ] })
 
                 const formURL = getFormURL(uid)
                 const {email, firstName, lastName} = member
