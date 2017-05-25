@@ -473,9 +473,13 @@ const MutationType = new GraphQLObjectType({
                     }
                 })
 
+                if (member) {
+                    member = member.get({ plain: true })
+                }
+
                 console.log("Found member")
                 console.log(member)
-                
+
                 if (!member) {
                     member = input.member
                 }
@@ -483,6 +487,9 @@ const MutationType = new GraphQLObjectType({
     			const data = _.omit(_.clone(input), 'location', 'member')
                 const form = await HousingForm.create({ data, uid, locationId, member }, { include: [ Member ] })
 
+                console.log("Created form")
+                console.log(form.get({ plain: true }))
+                
                 const formURL = getFormURL(uid)
                 const {email, firstName, lastName} = member
                 const name = `${ firstName } ${ lastName }`.trim()
