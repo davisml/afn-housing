@@ -61,6 +61,7 @@ const getLocations = (callback) => {
 					createdAt
 					rejectedAt
 					approvedAt
+					archivedAt
 					member {
 						firstName
 						lastName
@@ -143,6 +144,7 @@ class AppComponent extends React.Component {
 		const selectedLocation = Number(query.location || 0)
 		const filterNumberOfRooms = query.rooms || ''
 		const filterStatus = query.status || 0
+		const showArchived = (query.archived == 'true')
 
 		const changeLocation = ({ target }) => {
 			const {value: location} = target
@@ -219,6 +221,10 @@ class AppComponent extends React.Component {
 			forms = forms.filter((form) => (form.numberOfRooms <= Number(filterNumberOfRooms)))
 		}
 
+		if (!showArchived) {
+			forms = forms.filter((form) => !form.archivedAt)
+		}
+		
 		if (filterStatus > 0) {
 			forms = forms.filter((form) => {
 				if (filterStatus == 1 && form.approvedAt) {
@@ -232,16 +238,16 @@ class AppComponent extends React.Component {
 				return false
 			})
 		}
-
+		
 		forms = forms.sort((a, b) => {
 			if (a.date < b.date) {
 				return -1
 			}
-
+			
 			if (a.date > b.date) {
 				return 1
 			}
-
+			
 			return 0
 		})
 
@@ -435,6 +441,15 @@ class AppComponent extends React.Component {
 			this.setParams({ rooms })
 		}
 
+		const toggleArchived = ({ target }) => {
+			const {checked: archived} = target
+
+			console.log(`toggle archived`)
+			console.log(archived)
+
+			this.setParams({ archived })
+		}
+
 		const statusOptions = ['All Forms', 'Approved', 'Pending', 'Rejected'].map((label, index) => {
 			const key = `status-${index}`
 			
@@ -462,6 +477,9 @@ class AppComponent extends React.Component {
 						<div className="search-row" style={{padding: '0px 20px', paddingTop: '15px'}}>
 							<label>Location</label>
 							<select value={ selectedLocation } onChange={ changeLocation }>{ locationOptions }</select>
+						</div>
+						<div className="search-row" style={{padding: '0px 20px', paddingTop: '15px'}}>
+							<input type="checkbox" onChange={ toggleArchived } checked={ showArchived } /><label>Show Archived</label>
 						</div>
 					</div>
 					<div className="forms-list">

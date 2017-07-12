@@ -86,11 +86,18 @@ const HousingForm = db.define('housingForm', {
 	rejectedAt: {
 		type: Sequelize.DATE,
 		allowNull: true
+	},
+	archivedAt: {
+		type: Sequelize.DATE,
+		allowNull: true
 	}
 })
 
 HousingForm.belongsTo(Location)
+Location.hasMany(HousingForm)
+
 HousingForm.belongsTo(Member)
+Member.hasMany(HousingForm)
 
 db.sync()
 

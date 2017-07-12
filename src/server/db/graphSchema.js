@@ -287,6 +287,9 @@ const HousingFormType = new GraphQLObjectType({
         approvedAt: {
             type: GraphQLString
         },
+        archivedAt: {
+            type: GraphQLString
+        },
         member: {
         	type: MemberType,
         	resolve: async function(findOptions, args, context, info) {
@@ -473,27 +476,44 @@ const MutationType = new GraphQLObjectType({
                     }
                 })
 
+                let form = null
+
+                const data = _.omit(_.clone(input), 'location', 'member')
+                const formData = { data, uid, locationId }
+
                 if (member) {
+                    console.log('find forms for member')
+                    console.log(member)
+
+                    // form = await HousingForm.findOne({
+                    //     where: {
+                    //         'Member.scid': member.id
+                    //     }
+                    // })
+
                     member = member.get({ plain: true })
-                }
-
-                console.log("Found member")
-                console.log(member)
-
-                if (!member) {
+                    formData.memberId = member.id
+                } else {
                     member = input.member
+                    formData.member = input.member
                 }
 
-    			const data = _.omit(_.clone(input), 'location', 'member')
-                const form = await HousingForm.create({ data, uid, locationId, member }, { include: [ Member ] })
+                console.log("Create form")
 
+                try {
+                    form = await HousingForm.create(formData, { include: [ Member ] })
+                }
+                catch(error) {
+                    console.log(error)
+                }
                 console.log("Created form")
                 console.log(form.get({ plain: true }))
                 
                 const formURL = getFormURL(uid)
                 const {email, firstName, lastName} = member
                 const name = `${ firstName } ${ lastName }`.trim()
-
+                
+                console.log("Send email")
                 const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed.\n\nTo update your form use the url below:\n\n" + formURL
 
                 // IF THE BAND NUMBER ALREADY EXISTS IN THE DATABASE
@@ -503,6 +523,15 @@ const MutationType = new GraphQLObjectType({
                 // "If you have previously submitted an application, please check your email."
                 // "If you have questions contact the band."
 
+                // Send to itsupport
+                sendEmail({
+                    to: [{ email: 'itsupport@acadiaband.ca', name: 'Joe Falls', type: "to" }],
+                    html: `<p>${ emailBody }</p>`,
+                    text: emailBody,
+                    subject: "Housing form received",
+                })
+
+                // Send to user
                 sendEmail({
                     to: [{ email, name, type: "to" }],
                     html: `<p>${ emailBody }</p>`,
@@ -543,6 +572,34 @@ const MutationType = new GraphQLObjectType({
                     text: emailBody,
                     subject: "Housing form approved",
                 })
+
+                return form
+            }
+        },
+        archiveForm: {
+            args: {
+                id: {
+                    type: GraphQLInt
+                }
+            },
+            type: HousingFormType,
+            resolve: async function(findOptions, { id, message }) {
+                var form = null
+
+                try {
+                    form = await HousingForm.findById(id, {
+                        include: [
+                            { model: Member, required: true }
+                        ]
+                    })
+
+                    await form.update({ archivedAt: new Date() })
+                }
+
+                catch(error) {
+                    console.log("REJECT FAILED")
+                    console.error(error)
+                }
 
                 return form
             }

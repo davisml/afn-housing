@@ -62,16 +62,16 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		delete formData.member.telephone
 
 		// formData.birthDate = Moment()
-		console.log(`month: ${ formData.birthMonth }`)
+		// console.log(`month: ${ formData.birthMonth }`)
 
 		const year = Number(formData.birthYear)
 		const month = Number(formData.birthMonth) - 1
 		const day = Number(formData.birthDayOfMonth)
 
-		console.log(`${ day }/${ month }/${ year }`)
+		// console.log(`${ day }/${ month }/${ year }`)
 
 		const date = new Date(year, month, day)
-
+		
 		console.log(`birth date`)
 		console.log(date)
 
@@ -93,7 +93,7 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 				const value = data.get(key)
 
 				if (!validateField(key, value)) {
-					console.log(`${ key } is invalid`)
+					// console.log(`${ key } is invalid`)
 					valid = false
 				}
 			})
@@ -119,7 +119,7 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 			}
 		} else if (currentStep == 2) {
 			const individuals = data.get('individuals').toJS().slice()
-			console.log(individuals)
+			// console.log(individuals)
 
 			for (let i = 0; i < individuals.length; i++) {
 				const person = individuals[i]
@@ -130,10 +130,10 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 			}
 		}
 
-		console.log(`validate: ${ valid }`)
+		// console.log(`validate: ${ valid }`)
 		onChange(data.set('invalid', !valid))
 
-		console.log(data.get('invalid'))
+		// console.log(data.get('invalid'))
 
 		return valid
 	}
@@ -164,7 +164,7 @@ let FormComponent = ({data, onChange, onSubmit, goForward: forward, goBack, curr
 		forwardText = 'Submit'
 	}
 
-	return <div className='form' autoComplete='on'>
+	return <div className="form" autoComplete="on">
 		{ currentTab }
 		<div className="form-row" style={{textAlign: 'right', flexDirection: 'row', justifyContent: 'flex-end'}}>
 			{ backButton }

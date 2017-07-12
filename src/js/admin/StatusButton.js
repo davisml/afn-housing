@@ -11,7 +11,7 @@ class StatusButton extends React.Component {
 	}
 
 	render() {
-		const {status, onApprove, onReject} = this.props
+		const {status, onApprove, onReject, onArchive} = this.props
 
 		const approve = () => {
 			this.setState({showMenu: false})
@@ -23,17 +23,28 @@ class StatusButton extends React.Component {
 			onReject()
 		}
 
+		const archive = () => {
+			this.setState({showMenu: false})
+			onArchive()
+		}
+
 		let statusMenu = null
 
 		if (this.state.showMenu) {
-			statusMenu = <div className="status-menu">
-				<div className="menu-item approve" onClick={ approve }>Approve</div>
-				<div className="menu-item reject" onClick={ reject }>Reject</div>
-			</div>
+			if (status === "Pending") {
+				statusMenu = <div className="status-menu">
+					<div className="menu-item approve" onClick={ approve }>Approve</div>
+					<div className="menu-item reject" onClick={ reject }>Reject</div>
+				</div>
+			} else {
+					statusMenu = <div className="status-menu">
+					<div className="menu-item archive" onClick={ archive }>Archive</div>
+				</div>
+			}
 		}
 
 		const showMenu = (event) => {
-			if (status != "Pending") {
+			if (status === "Archived") {
 				return
 			}
 			

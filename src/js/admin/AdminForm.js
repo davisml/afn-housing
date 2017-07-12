@@ -27,6 +27,15 @@ const rejectForm = (id, message) => Query(`
 	}`,
 { id, message })
 
+const archiveForm = (id) => Query(`
+	mutation ArchiveForm($id: Int) {
+		archiveForm(id: $id) {
+			id,
+			archivedAt
+		}
+	}`,
+{ id })
+
 class AdminForm extends React.Component {
 	constructor(props) {
 		super(props)
@@ -60,6 +69,7 @@ class AdminForm extends React.Component {
 				    createdAt
 				    approvedAt
 				    rejectedAt
+				    archivedAt
 				    data {
 				      additionalInformation
 				      currentLivingConditions
@@ -209,7 +219,7 @@ class AdminForm extends React.Component {
 		}
 
 		if (form.data) {
-			individuals.splice(0, 0, { name: fullName, age: getAge(new Date(form.data.birthDate)), relationship: 'Applicant'})
+			individuals.splice(0, 0, { name: fullName, age: getAge(new Date(form.member.birthDate)), relationship: 'Applicant'})
 		}
 
 		let infoContent = null
@@ -285,6 +295,12 @@ class AdminForm extends React.Component {
 
 			const approveApplication = () => {
 				const message = prompt("Enter an approval message", "")
+
+				if (_.isNull(message)) {
+					return
+				}
+
+				console.log("Approve application")
 				
 				approveForm(form.id, message).then(({ approveForm }) => {
 					let newForm = _.clone(this.state.housingForm)
@@ -299,7 +315,13 @@ class AdminForm extends React.Component {
 			const rejectApplication = () => {
 				const message = prompt("Enter a rejection reason", "")
 				
-				rejectForm(form.id, message).then(({ rejectForm }) => {
+				if (_.isNull(message)) {
+					return
+				}
+
+				console.log("Reject application")
+
+				rejectForm(form.id).then(({ rejectForm }) => {
 					let newForm = _.clone(this.state.housingForm)
 					newForm = _.extend(newForm, rejectForm)
 					this.setState({ housingForm: newForm })
@@ -309,19 +331,37 @@ class AdminForm extends React.Component {
 				})
 			}
 
+			const archiveApplication = () => {
+				archiveForm(form.id).then(({ archiveForm }) => {
+					let newForm = _.clone(this.state.housingForm)
+					newForm = _.extend(newForm, archiveForm)
+					this.setState({ housingForm: newForm })
+				}).catch((error) => {
+					console.log("Error")
+					console.error(error)
+				})
+			}
+
 			var buttonStatus = null
+			var archivedText = null
 
 			if (form.approvedAt) {
 				buttonStatus = "Approved"
 			} else if (form.rejectedAt) {
 				buttonStatus = "Rejected"
+			} else if (form.archivedAt) {
+				buttonStatus = "Archived"
 			} else {
 				buttonStatus = "Pending"
 			}
 
+			if (form.archivedAt) {
+				archivedText = <span className="archived">(Archived)</span>
+			}
+
 			infoContent = <div id="admin-content" style={{textAlign: 'left'}}>
-				<h2>{ formTitle }</h2>
-				<StatusButton status={ buttonStatus } onApprove={ approveApplication } onReject={ rejectApplication } />
+				<h2>{ formTitle }{ archivedText }</h2>
+				<StatusButton status={ buttonStatus } onApprove={ approveApplication } onReject={ rejectApplication } onArchive={ archiveApplication } />
 				<div className="form-group">
 					{ formRows }
 				</div>
