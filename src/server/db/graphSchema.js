@@ -485,11 +485,31 @@ const MutationType = new GraphQLObjectType({
                     console.log('find forms for member')
                     console.log(member)
 
-                    // form = await HousingForm.findOne({
-                    //     where: {
-                    //         'Member.scid': member.id
-                    //     }
-                    // })
+                    let existingForm = null
+
+                    try {
+                        existingForm = await HousingForm.findOne({
+                            where: {
+                                archivedAt: null
+                            },
+                            include: [
+                                {
+                                    model: Member,
+                                    required: true,
+                                    where: { scisID }
+                                }
+                            ]
+                        })
+
+                        existingForm.archivedAt = new Date()
+
+                        await existingForm.save()
+                    }
+                    catch(error) {
+                        existingForm = null
+                        console.log("ERROR FINDING FORM")
+                        console.error(error)
+                    }
 
                     member = member.get({ plain: true })
                     formData.memberId = member.id
