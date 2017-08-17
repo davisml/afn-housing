@@ -299,7 +299,7 @@ class AdminForm extends React.Component {
 				if (_.isNull(message)) {
 					return
 				}
-
+				
 				console.log("Approve application")
 				
 				approveForm(form.id, message).then(({ approveForm }) => {
@@ -321,7 +321,7 @@ class AdminForm extends React.Component {
 
 				console.log("Reject application")
 
-				rejectForm(form.id).then(({ rejectForm }) => {
+				rejectForm(form.id, message).then(({ rejectForm }) => {
 					let newForm = _.clone(this.state.housingForm)
 					newForm = _.extend(newForm, rejectForm)
 					this.setState({ housingForm: newForm })
