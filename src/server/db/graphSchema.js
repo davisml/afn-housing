@@ -293,6 +293,9 @@ const HousingFormType = new GraphQLObjectType({
         member: {
         	type: MemberType,
         	resolve: async function(findOptions, args, context, info) {
+                console.log(`find member by id`)
+                console.log(findOptions.memberId)
+
 		    	return await Member.findById(findOptions.memberId)
 		    }
         },
@@ -466,6 +469,15 @@ const MutationType = new GraphQLObjectType({
     		type: HousingFormType,
     		resolve: async function(findOptions, { input }) {
     			const {location: locationId} = input
+
+                if (!locationId) {
+                    throw(new Error("invalid location id"))
+                }
+
+                // console.log("resolve")
+                console.log(`location id`)
+                console.log(locationId)
+
                 const uid = ShortID()
 
                 const {scisID} = input.member
@@ -488,6 +500,8 @@ const MutationType = new GraphQLObjectType({
                     member.email = input.member.email
                     member.firstName = input.member.firstName
                     member.lastName = input.member.lastName
+                    member.phone = input.member.phone
+                    member.birthDate = input.member.birthDate
 
                     let existingForm = null
 
@@ -508,6 +522,7 @@ const MutationType = new GraphQLObjectType({
                         })
 
                         existingForm.archivedAt = new Date()
+                        existingForm.member = member.id
 
                         await existingForm.save()
                     }
@@ -541,13 +556,6 @@ const MutationType = new GraphQLObjectType({
                 
                 console.log("Send email")
                 const emailBody = "Thank you for submitting your housing form. You will receive another email from us once it has been processed.\n\nTo update your form use the url below:\n\n" + formURL
-
-                // IF THE BAND NUMBER ALREADY EXISTS IN THE DATABASE
-                // AND THAT FORM IS STILL PENDING – SEND EMAIL / SHOW ON SCREEN:
-                // "We currently have a pending application associated with the provided band number:"
-                // [ show_band_number ]
-                // "If you have previously submitted an application, please check your email."
-                // "If you have questions contact the band."
 
                 const emailHTML = `
                     <p>Thank you for submitting your housing form. You will receive another email from us once it has been processed.</p>

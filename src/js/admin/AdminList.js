@@ -261,9 +261,22 @@ class AppComponent extends React.Component {
 			}
 		}
 
-		const renderFormItem = ({ id, member, createdAt: submitDate, rejectedAt, approvedAt, location, data, numberOfRooms: familySize }, index) => {
+		const renderFormItem = (formItem, index) => {
+			let { id, member, createdAt: submitDate, rejectedAt, approvedAt, location, data, numberOfRooms: familySize } = formItem
 			const {individuals = []} = data
 			const key = `form-item-${ index }`
+
+			console.log("Render form item")
+			console.log(member)
+
+			// let description = ''
+
+			if (!member) {
+				console.log("Invalid member")
+				console.log(formItem)
+				return null
+			}
+
 			const description = `${ member.firstName } ${ member.lastName }`
 			const ranking = index + 1
 
@@ -362,6 +375,10 @@ class AppComponent extends React.Component {
 			}
 
 			const iconProps = { status, fill: statusFills[status] }
+
+			if (formItem.archivedAt) {
+				iconProps.fill = "rgb(140,140,140)"
+			}
 			const statusIcon = <StatusIcon { ...iconProps } />
 
 			if (selectedLocation === 0) {
