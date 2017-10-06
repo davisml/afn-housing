@@ -319,7 +319,7 @@ class AppComponent extends React.Component {
 				// console.log(individual)
 				// console.log(relationship)
 
-				if (relationship == "son" || relationship == "child") {
+				if (relationship == "son" || relationship == "boy" || relationship == "child") {
 					rank = 1
 				} else if (relationship == "daughter") {
 					rank = 2

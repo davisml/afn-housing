@@ -60,7 +60,7 @@ const Family = ({ people }) => {
 			width = 18
 
 			icon = <Woman {...iconProps} width={ width } height={ 26 } y={ 6 }/>
-		} else if (person.relationship == "son" || person.relationship == "child") {
+		} else if (person.relationship == "boy" || person.relationship == "son" || person.relationship == "child") {
 			width = 18
 
 			icon = <Man {...iconProps} width={ width } height={ 26 } y={ 6 }/>
