@@ -88,6 +88,13 @@ class AdminForm extends React.Component {
 				}
 			}
 		`).then(({ housingForm }) => {
+			let individuals = []
+
+			if (housingForm.data) {
+				individuals = housingForm.data.individuals
+				individuals.splice(0, 0, { name: fullName, age: getAge(new Date(housingForm.member.birthDate)), relationship: 'Applicant'})
+			}
+			
 			this.setState({ housingForm })
 		})
 
@@ -216,10 +223,6 @@ class AdminForm extends React.Component {
 		    var now = new Date()
 		    var age = now.getFullYear() - date.getFullYear()
 		    return age
-		}
-
-		if (form.data) {
-			individuals.splice(0, 0, { name: fullName, age: getAge(new Date(form.member.birthDate)), relationship: 'Applicant'})
 		}
 
 		let infoContent = null
