@@ -49,6 +49,12 @@ class AdminForm extends React.Component {
 	componentDidMount() {
 		console.log(`admin mounted`)
 		const {formId} = this.props.params
+
+		function getAge(date) {
+		    var now = new Date()
+		    var age = now.getFullYear() - date.getFullYear()
+		    return age
+		}
 		
 		Query(`
 			query {
@@ -88,9 +94,16 @@ class AdminForm extends React.Component {
 				}
 			}
 		`).then(({ housingForm }) => {
+
 			let individuals = []
 
 			if (housingForm.data) {
+				let fullName = ''
+
+				if (housingForm.member) {
+					fullName = `${ housingForm.member.firstName } ${ housingForm.member.lastName }`
+				}
+
 				individuals = housingForm.data.individuals
 				individuals.splice(0, 0, { name: fullName, age: getAge(new Date(housingForm.member.birthDate)), relationship: 'Applicant'})
 			}
@@ -194,12 +207,6 @@ class AdminForm extends React.Component {
 		console.log('form')
 		console.log(form)
 
-		let fullName = ''
-
-		if (form.member) {
-			fullName = `${ form.member.firstName } ${ form.member.lastName }`
-		}
-
 		const renderIndividual = ({ name, age, relationship: rel }, index) => {
 			const relationship = rel.charAt(0).toUpperCase() + rel.slice(1)
 			const key = `individual-${ index }`
@@ -218,13 +225,6 @@ class AdminForm extends React.Component {
 		}
 
 		let individuals = form.data ? form.data.individuals : []
-
-		function getAge(date) {
-		    var now = new Date()
-		    var age = now.getFullYear() - date.getFullYear()
-		    return age
-		}
-
 		let infoContent = null
 
 		if (form.id) {
