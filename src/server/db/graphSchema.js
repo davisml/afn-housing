@@ -569,7 +569,7 @@ const MutationType = new GraphQLObjectType({
 
                 // Send to itsupport
                 sendEmail({
-                    to: [{ email: 'itsupport@acadiaband.ca', name: 'Joe Falls', type: "to" }],
+                    to: [{ email: 'housingapplications@acadiaband.ca', name: 'Housing Applications', type: "to" }],
                     html: supportHTML,
                     text: supportBody,
                     subject: "Housing form received",
